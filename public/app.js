@@ -96,7 +96,8 @@
     ]);
     S.config = config;
     S.index = (index.digests || []).slice().sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
-    S.tasks = store.get('tasks', null) || config.tasks || [];
+    // Local copy is used only if it holds edits that never reached the cloud.
+    S.tasks = (store.get('tasksDirty', false) && store.get('tasks', null)) || config.tasks || [];
     try {
       const r = await fetch('/api/state', { cache: 'no-store' });
       if (r.ok) {
@@ -119,7 +120,7 @@
     S.digests[entry.id] = d; return d;
   }
   async function persist() {
-    store.set('tasks', S.tasks); store.set('saved', S.saved);
+    store.set('tasks', S.tasks); store.set('saved', S.saved); store.set('tasksDirty', true);
     if (!S.cloud) { toast(t('localOnly')); return; }
     try {
       const r = await fetch('/api/state', {
@@ -127,6 +128,7 @@
         body: JSON.stringify({ tasks: S.tasks, saved: S.saved })
       });
       if (r.status === 401) { toast(t('wrongPin')); return; }
+      if (r.ok) store.set('tasksDirty', false);
       toast(r.ok ? t('syncedCloud') : t('localOnly'));
     } catch { toast(t('localOnly')); }
   }
