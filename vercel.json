@@ -40,15 +40,6 @@
     },
     "api/claude.js": {
       "maxDuration": 60
-    },
-    "api/telegram.js": {
-      "maxDuration": 60
     }
-  },
-  "crons": [
-    {
-      "path": "/api/telegram?action=digest",
-      "schedule": "50 4 * * *"
-    }
-  ]
+  }
 }

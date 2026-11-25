@@ -1,7 +1,7 @@
 /* Pulmonologist — starter content.
    Edit this file to change the lists every new device starts with.
    Items you add inside the app are saved separately and are not overwritten. */
-window.PULMO_SEED_VERSION = 2;
+window.PULMO_SEED_VERSION = 3;
 window.PULMO_SEED = {
 guidelines:[
 {id:"g-gold27",title:"GOLD 2027 Report (COPD)",org:"GOLD",date:"2026-11-18",url:"https://goldcopd.org/",tag:"COPD",note:"Presented Nov 2026, final version on World COPD Day. CT at least once in the initial work-up where available; LAMA as initial therapy for group A; pre-COPD now six groups; “early COPD” dropped in clinical use; more specific cardiovascular advice (NT-proBNP, SGLT2 inhibitors, cardioselective β-blockers); new joint GOLD–GINA section on global challenges."},
@@ -47,8 +47,7 @@ people:[
 {id:"p12",name:"Ganesh Raghu",focus:"IPF guidelines · Seattle",q:"Raghu G"},
 {id:"p13",name:"Marc Humbert",focus:"Pulmonary hypertension · Paris",q:"Humbert M"},
 {id:"p14",name:"Shawn D. Aaron",focus:"COPD and asthma diagnosis · Ottawa",q:"Aaron SD"},
-{id:"p15",name:"Christopher E. Brightling",focus:"Airway disease · Leicester",q:"Brightling CE"},
-{id:"p16",name:"Dr Belal Fadel",focus:"Arabic respiratory education",q:"",url:"https://belalfadel.net/"}],
+{id:"p15",name:"Christopher E. Brightling",focus:"Airway disease · Leicester",q:"Brightling CE"}] ,
 books:[
 {id:"b1",title:"Murray & Nadel's Textbook of Respiratory Medicine",ed:"7th ed., 2022"},
 {id:"b2",title:"Fishman's Pulmonary Diseases and Disorders",ed:"6th ed., 2023"},
@@ -76,7 +75,6 @@ sources:[
 {id:"s13",name:"CHEST journal",kind:"journal",url:"https://journal.chestnet.org/"},
 {id:"s14",name:"NEJM",kind:"journal",url:"https://www.nejm.org/"},
 {id:"s15",name:"Breathe (ERS, open access)",kind:"journal",url:"https://publications.ersnet.org/content/breathe"},
-{id:"s16",name:"belalfadel.net",kind:"news",url:"https://belalfadel.net/"},
 {id:"s17",name:"Healio Pulmonology",kind:"news",url:"https://www.healio.com/news/pulmonology"},
 {id:"s18",name:"The Limbic: Respiratory",kind:"news",url:"https://thelimbic.com/"},
 {id:"s19",name:"Medscape Pulmonary Medicine",kind:"news",url:"https://www.medscape.com/pulmonarymedicine"}],

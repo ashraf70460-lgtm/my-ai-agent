@@ -5,9 +5,12 @@
       "date": "2026-11-25",
       "taskId": "daily-digest",
       "file": "2026-11-25-daily-digest.json",
-      "title": { "en": "GOLD 2027 is out: LAMA now first-line for group A", "ar": "صدور تقرير GOLD 2027: موسّع LAMA أصبح الخيار الأول للمجموعة A" },
+      "title": {
+        "en": "GOLD 2027 is out: LAMA now first-line for group A",
+        "ar": "صدور تقرير GOLD 2027: موسّع LAMA أصبح الخيار الأول للمجموعة A"
+      },
       "starCount": 2,
-      "itemCount": 8
+      "itemCount": 6
     }
   ]
 }

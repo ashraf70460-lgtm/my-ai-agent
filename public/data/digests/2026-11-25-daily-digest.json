@@ -118,46 +118,6 @@
         }
       ],
       "category": "websites"
-    },
-    {
-      "sourceId": "tg-hamdi",
-      "source": "Pulmonary Insights | Dr Hamdi Al Turkey",
-      "type": "telegram",
-      "items": [
-        {
-          "star": false,
-          "headline": {
-            "en": "Advanced Case Studies in Pulmonary Medicine, Vol. I (2026)",
-            "ar": "دراسات حالة متقدمة في طب الرئة، المجلد الأول (2026)"
-          },
-          "summary": {
-            "en": "527 pages, 25 monographs and 200 viva questions — first of a planned four-volume clinical-reasoning series.",
-            "ar": "527 صفحة و25 دراسة و200 سؤال شفهي، وهو الأول من سلسلة مخططة من أربعة مجلدات في الاستدلال السريري."
-          },
-          "url": "https://t.me/DrHamdiTurkey"
-        }
-      ],
-      "category": "telegram"
-    },
-    {
-      "sourceId": "tg-bookjuice",
-      "source": "عصير الكتب / حُبًّا للقراءة",
-      "type": "telegram",
-      "items": [
-        {
-          "star": false,
-          "headline": {
-            "en": "Preview unavailable",
-            "ar": "المعاينة غير متاحة"
-          },
-          "summary": {
-            "en": "These channels don't show posts on their public web page.",
-            "ar": "هذه القنوات لا تعرض منشوراتها على صفحتها العامة."
-          },
-          "url": "https://t.me/BoOkJuiCe"
-        }
-      ],
-      "category": "telegram"
     }
   ]
 }

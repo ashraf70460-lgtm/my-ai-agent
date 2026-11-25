@@ -139,7 +139,6 @@ body.sub .hero{display:none}
 .cat-guidelines .cathead{background:#c4291a}
 .cat-papers .cathead{background:#1a47c9}
 .cat-websites .cathead{background:#0f6b5c}
-.cat-telegram .cathead{background:#2481cc}
 .srcblock{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
 .srcname{font-size:13px;font-weight:800;color:var(--mute);margin-bottom:6px}
 .ritem{padding:8px 0;border-top:1px solid var(--line)}

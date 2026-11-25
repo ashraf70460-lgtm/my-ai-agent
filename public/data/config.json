@@ -10,8 +10,8 @@
         "ar": "التقرير اليومي لطب الصدر"
       },
       "description": {
-        "en": "Every morning: news from my websites, new or updated guidelines, important new papers on my topics, and important or interesting pulmonary posts found across public Telegram channels.",
-        "ar": "كل صباح: أخبار مواقعي، والإرشادات الجديدة أو المحدّثة، وأهم الأبحاث الجديدة في مواضيعي، والمنشورات المهمة أو اللافتة في طب الصدر من قنوات تيليجرام العامة."
+        "en": "Every morning: news from my society websites, new or updated guidelines, and important new papers on my topics.",
+        "ar": "كل صباح: أخبار مواقع الجمعيات التي أتابعها، والإرشادات الجديدة أو المحدّثة، وأهم الأبحاث الجديدة في مواضيعي."
       },
       "schedule": {
         "en": "Every day · 6:33 AM (Riyadh)",
@@ -48,19 +48,12 @@
           "type": "website",
           "name": "GOLD — COPD",
           "url": "https://goldcopd.org"
-        },
-        {
-          "id": "belalfadel",
-          "type": "website",
-          "name": "Belal Fadel — belalfadel.net",
-          "url": "https://belalfadel.net"
         }
       ],
       "sections": {
         "websites": true,
         "guidelines": true,
-        "papers": true,
-        "telegram": true
+        "papers": true
       }
     }
   ]
