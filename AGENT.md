@@ -4,7 +4,7 @@ The app is a static site. Each agent run **adds a digest file and updates the in
 
 ## 1. Read the current sources
 
-Tasks and sources the user edits in the app live at `https://<app-domain>/api/state` (JSON: `{ "state": { "tasks": [...] } }`).
+Tasks and sources the user edits in the app live at `https://my-ai-agent-coral.vercel.app/api/state` (JSON: `{ "state": { "tasks": [...] } }`).
 If that returns `state: null` or fails, fall back to `public/data/config.json` in this repo.
 Only use sources of tasks with `"enabled": true`.
 
