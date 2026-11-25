@@ -22,3 +22,33 @@ Plain HTML/CSS/JS (no build step) in `public/`, one Vercel Function `api/state.j
 ## How the agent publishes
 
 See [AGENT.md](AGENT.md).
+
+---
+
+# Pulmonologist — `/pulmonologist/`
+
+A second app in this repo: an AI agent for respiratory medicine. It reads PubMed for new papers and guidelines on your topics, writes a briefing with Claude, and keeps conferences (with countdowns), videos, people to follow, books, websites and Telegram channels in one place. English / العربية, installable as an app (Android, iPhone "Add to Home Screen", Windows/Mac via Chrome/Edge "Install").
+
+Open it at **`https://<your-domain>/pulmonologist/`**.
+
+## Sections
+Today (briefing, top papers, next events) · **Tasks** (the agent's jobs — topic watch, guideline watch, and any number of custom PubMed watches you add) · Papers · Guidelines · Conferences · Videos · People · Books · Sources & Telegram · Ask (chat that can search PubMed live).
+
+## Environment variables (Vercel → Project → Settings → Environment Variables)
+
+| Variable | Needed for |
+|---|---|
+| `ANTHROPIC_API_KEY` | Briefings, “Explain”, “Ask the agent”, suggestions. Without it, PubMed papers and all lists still work. |
+| `CLAUDE_MODEL` | Optional. Defaults to `claude-sonnet-5-5`. |
+| `NCBI_API_KEY` | Optional. Faster PubMed (free key from your NCBI account). |
+| `APP_PIN` | Already used by My Agent. If set, enter it in Pulmonologist → Settings to use AI and sync. |
+| `BLOB_READ_WRITE_TOKEN` | Already set. Syncs Pulmonologist settings across devices (`state/pulmonologist.json`). |
+
+## Files
+- `public/pulmonologist/index.html` — page layout
+- `public/pulmonologist/app.css` — styles
+- `public/pulmonologist/app.js` — app logic (see the comment at the top for adding a new section)
+- `public/pulmonologist/data.js` — starter lists (guidelines, conferences, videos, people, books, sources, topics). Raise `PULMO_SEED_VERSION` after adding items so existing devices receive them.
+- `api/pubmed.js`, `api/_pubmed.js` — PubMed (NCBI E-utilities)
+- `api/claude.js` — Claude, with a `pubmed_search` tool
+- `api/pulmo-state.js` — cross-device sync

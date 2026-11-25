@@ -1,0 +1,23 @@
+{
+  "name": "Pulmonologist — respiratory update agent",
+  "short_name": "Pulmonologist",
+  "description": "AI agent for respiratory medicine: new papers, guidelines, conferences, videos, people to follow, books and channels. English / العربية.",
+  "id": "/pulmonologist/",
+  "start_url": "/pulmonologist/#home",
+  "scope": "/pulmonologist/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1a47c9",
+  "icons": [
+    { "src": "/pulmonologist/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/pulmonologist/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/pulmonologist/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/pulmonologist/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Papers", "url": "/pulmonologist/#papers" },
+    { "name": "Ask the agent", "url": "/pulmonologist/#ask" },
+    { "name": "Conferences", "url": "/pulmonologist/#events" }
+  ]
+}
