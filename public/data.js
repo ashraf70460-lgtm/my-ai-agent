@@ -1,7 +1,7 @@
 /* Pulmonologist — starter content.
    Edit this file to change the lists every new device starts with.
    Items you add inside the app are saved separately and are not overwritten. */
-window.PULMO_SEED_VERSION = 1;
+window.PULMO_SEED_VERSION = 2;
 window.PULMO_SEED = {
 guidelines:[
 {id:"g-gold27",title:"GOLD 2027 Report (COPD)",org:"GOLD",date:"2026-11-18",url:"https://goldcopd.org/",tag:"COPD",note:"Presented Nov 2026, final version on World COPD Day. CT at least once in the initial work-up where available; LAMA as initial therapy for group A; pre-COPD now six groups; “early COPD” dropped in clinical use; more specific cardiovascular advice (NT-proBNP, SGLT2 inhibitors, cardioselective β-blockers); new joint GOLD–GINA section on global challenges."},
@@ -79,6 +79,5 @@ sources:[
 {id:"s16",name:"belalfadel.net",kind:"news",url:"https://belalfadel.net/"},
 {id:"s17",name:"Healio Pulmonology",kind:"news",url:"https://www.healio.com/news/pulmonology"},
 {id:"s18",name:"The Limbic: Respiratory",kind:"news",url:"https://thelimbic.com/"},
-{id:"s19",name:"Medscape Pulmonary Medicine",kind:"news",url:"https://www.medscape.com/pulmonarymedicine"},
-{id:"s20",name:"Dr Hamdi Turkey",kind:"telegram",url:"https://t.me/s/DrHamdiTurkey"}],
+{id:"s19",name:"Medscape Pulmonary Medicine",kind:"news",url:"https://www.medscape.com/pulmonarymedicine"}],
 topics:[["COPD",1],["asthma",1],["bronchiectasis",1],["interstitial lung disease",1],["pulmonary embolism",1],["pleural effusion",1],["tuberculosis",1],["obstructive sleep apnea",1],["ARDS",1],["pulmonary hypertension",0],["lung cancer screening",0],["sarcoidosis",0],["nontuberculous mycobacteria",0]].map(([k,on])=>({k,on}))};

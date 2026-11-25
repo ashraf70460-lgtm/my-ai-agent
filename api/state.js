@@ -1,5 +1,6 @@
-// Shared app state (tasks, sources, saved items) kept in Vercel Blob so it
-// syncs across phone and computer. Reads are open; writes need the APP_PIN.
+// Pulmonologist app state, kept in Vercel Blob so it syncs across phone and computer.
+// state.tasks = the scheduled agent's tasks and website sources (read by each agent run);
+// the rest = topics, watches, lists and saved items. Reads are open; writes need APP_PIN.
 import { put, list } from '@vercel/blob';
 
 const PATH = 'state/state.json';
@@ -36,11 +37,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'invalid-state' });
       }
       const state = {
-        version: 1,
+        ...body,
+        version: 2,
         updatedAt: new Date().toISOString(),
         tasks: body.tasks,
         saved: Array.isArray(body.saved) ? body.saved.slice(0, 500) : []
       };
+      if (JSON.stringify(state).length > 900000) return res.status(413).json({ error: 'too-large' });
       await put(PATH, JSON.stringify(state, null, 2), {
         access: 'public',
         allowOverwrite: true,

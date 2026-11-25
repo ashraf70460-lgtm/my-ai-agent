@@ -1,9 +1,9 @@
 {
-  "name": "my-ai-agent",
+  "name": "pulmonologist",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Dr. Ashraf's personal AI agent — bilingual (EN/AR) digest app",
+  "description": "Pulmonologist — Dr. Ashraf's respiratory medicine AI agent (EN/AR)",
   "dependencies": {
     "@vercel/blob": "^1.0.0"
   }

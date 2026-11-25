@@ -1,17 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "owner": "Dr. Ashraf Ahmed",
   "tasks": [
     {
       "id": "daily-digest",
       "icon": "🫁",
       "name": {
-        "en": "Respiratory daily digest",
-        "ar": "الملخص اليومي لطب الجهاز التنفسي"
+        "en": "Daily respiratory report",
+        "ar": "التقرير اليومي لطب الصدر"
       },
       "description": {
-        "en": "New guidelines, statements and news from the major respiratory societies, plus my other followed websites.",
-        "ar": "أحدث الإرشادات والبيانات والأخبار من الجمعيات الكبرى لطب الجهاز التنفسي، مع المواقع الأخرى التي أتابعها."
+        "en": "Every morning: news from my websites, new or updated guidelines, important new papers on my topics, and important or interesting pulmonary posts found across public Telegram channels.",
+        "ar": "كل صباح: أخبار مواقعي، والإرشادات الجديدة أو المحدّثة، وأهم الأبحاث الجديدة في مواضيعي، والمنشورات المهمة أو اللافتة في طب الصدر من قنوات تيليجرام العامة."
       },
       "schedule": {
         "en": "Every day · 6:33 AM (Riyadh)",
@@ -55,7 +55,13 @@
           "name": "Belal Fadel — belalfadel.net",
           "url": "https://belalfadel.net"
         }
-      ]
+      ],
+      "sections": {
+        "websites": true,
+        "guidelines": true,
+        "papers": true,
+        "telegram": true
+      }
     }
   ]
 }

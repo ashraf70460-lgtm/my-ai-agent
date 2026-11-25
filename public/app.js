@@ -1,478 +1,204 @@
-/* My Agent — bilingual personal agent app (no build step). */
-(() => {
-  'use strict';
+/* Pulmonologist — Dr. Ashraf's respiratory medicine agent (no build step).
+   Data: /data/digests (daily agent reports, written by the scheduled agent — see AGENT.md),
+         /api/pubmed (live PubMed), /api/claude (Claude), /api/state (synced settings), /api/telegram.
+   To add a section: add its key to TABS, a <section id="v-KEY"> in index.html,
+   labels in T.en/T.ar, and a render function called from renderAll(). */
+{
+const SEED = window.PULMO_SEED, SEED_V = window.PULMO_SEED_VERSION || 1;
+const T={en:{home:"Today",reports:"Reports",papers:"Papers",guidelines:"Guidelines",events:"Conferences",videos:"Videos",people:"People",books:"Books",ask:"Ask",agent:"Agent",saved:"Saved",sources:"Links",settings:"Settings",run:"Check PubMed now",running:"Reading PubMed…",allReports:"All reports",reportItems:"in today's report",practiceN:"practice-changing",newPapers:"new papers",nextEvent:"days to next event",nowOn:"happening now",briefing:"Live PubMed briefing",topPapers:"Top new papers",upcoming:"Coming up",seeAll:"See all",back:"Back",topOnly:"Top journals only",watch:"In development: watch list",fromPubmed:"New guideline papers on PubMed",addOwn:"Add your own",add:"Add",suggest:"Ask the agent for more",ytNew:"Newest on YouTube by topic",send:"Send",appName:"App name",theme:"Theme",lookback:"Look back (days)",backup:"Backup and restore",copy:"Copy backup",restore:"Restore",close:"Close",explain:"Explain",open:"Open",remove:"Remove",latest:"Latest papers",findX:"Find on X",pubmed:"PubMed",save:"Save",unsave:"Saved",toTg:"Send to Telegram",noBrief:"Tap “Check PubMed now” and the agent will read PubMed and write a briefing.",noPapers:"No papers yet. Tap “Check PubMed now”.",lastRun:"Last PubMed check",never:"not yet",days:"days",ended:"ended",loopCap:"Flow–volume loop · the agent breathes in the literature",reportsLede:"Every daily report from your agent, divided into websites, guidelines, papers and Telegram. Search across all of them.",papersLede:"New on PubMed for your topics and watches, ranked by journal and study type.",guidesLede:"Major reports and society guidelines, plus new guideline and consensus papers found on PubMed.",eventsLede:"Respiratory meetings and deadlines with live countdowns. Confirm dates on the official site before booking.",videosLede:"Guideline walk-throughs, congress replays, and the newest YouTube uploads for each of your topics.",peopleLede:"Leading physicians behind the guidelines. Tap “Latest papers” to pull their newest work from PubMed.",booksLede:"Core references for a respiratory consultant. Check the publisher for a newer edition before buying.",sourcesLede:"Societies, journals and news sites to open yourself. The websites your agent checks every morning are in Agent.",askLede:"Ask anything in English or Arabic. The agent searches PubMed live and cites PMIDs and DOIs.",agentLede:"What your agent does. The daily report runs every morning and is divided into four sections. Live watches run whenever you tap “Check PubMed now”.",savedLede:"Report items and papers you bookmarked, on all your devices.",liveWatches:"Live PubMed watches",newWatch:"New watch",newTask:"New scheduled task",newTaskNote:"New scheduled tasks appear here right away. Ask Claude “activate my new task” to give it a schedule.",taskHelp:"Tip: use PubMed syntax. Examples: sarcoidosis[ti] · \"Practice Guideline\"[pt] AND asthma · Saudi Arabia[ad] AND respiratory",society:"Societies",journal:"Journals",news:"News & education",aiNote:"Suggestions from the agent's own knowledge. Verify dates and links before relying on them.",noAI:"AI features need ANTHROPIC_API_KEY on Vercel. Reports, PubMed papers and all lists work without it.",badPin:"Wrong or missing PIN. Enter the app PIN in Settings.",greet:["Good morning, Dr. Ashraf.","Good afternoon, Dr. Ashraf.","Good evening, Dr. Ashraf."],heroSub:"Here is what's new in respiratory medicine.",thinking:"Thinking…",pin:"App PIN (protects editing, AI and Telegram)",aiOn:"Claude connected",aiOff:"Claude not connected: add ANTHROPIC_API_KEY on Vercel",syncOn:"Synced across your devices",syncOff:"Saved on this device only",tgOn:"Telegram bot connected",tgNoChat:"Telegram bot added: send /start to your bot, then add TELEGRAM_CHAT_ID",tgOff:"Telegram not connected: add TELEGRAM_BOT_TOKEN on Vercel",tgConnect:"Connect bot",tgDone:"Bot connected. Open Telegram and send /start.",install:"Install",runOne:"Run",topicsT:"Topic watch",topicsD:"New PubMed papers for each topic you switch on. The daily report and Telegram scan use these topics too.",guideT:"Guideline watch",guideD:"Guideline, consensus and official statement papers in respiratory medicine (last 90 days).",editTopic:"Add topic, e.g. NTM",briefT:"Write a briefing with Claude after each check",copied:"Copied",restored:"Restored",offline:"You're offline. Showing your last results.",noReport:"No report yet. Your agent publishes one every morning.",topPick:"Top pick",all:"All",cat_websites:"Websites",cat_guidelines:"Guidelines",cat_papers:"Papers",cat_telegram:"Telegram",catD_websites:"News from the society and education websites in your list",catD_guidelines:"New or updated guidelines, statements and reports",catD_papers:"Important new papers on your topics",catD_telegram:"Important or interesting posts found across public Telegram channels",practice:"Practice-changing",items:"items",sentTg:"Sent to Telegram",websites:"Websites the agent checks",addSite:"Add website",siteName:"Name",siteUrl:"https://",enabled:"Active",paused:"Paused",sectionsT:"Report sections",noSaved:"Nothing saved yet. Tap the bookmark on any report item or paper.",schedule:"Schedule",noResults:"Nothing found."},
+ar:{home:"اليوم",reports:"التقارير",papers:"الأبحاث",guidelines:"الإرشادات",events:"المؤتمرات",videos:"الفيديوهات",people:"أطباء للمتابعة",books:"الكتب",ask:"اسأل",agent:"الوكيل",saved:"المحفوظات",sources:"روابط",settings:"الإعدادات",run:"افحص PubMed الآن",running:"جارٍ قراءة PubMed…",allReports:"كل التقارير",reportItems:"في تقرير اليوم",practiceN:"يغيّر الممارسة",newPapers:"بحث جديد",nextEvent:"يوم حتى المؤتمر القادم",nowOn:"منعقد الآن",briefing:"ملخص PubMed المباشر",topPapers:"أهم الأبحاث الجديدة",upcoming:"القادم",seeAll:"عرض الكل",back:"رجوع",topOnly:"المجلات الكبرى فقط",watch:"قيد الإعداد: قائمة المتابعة",fromPubmed:"أوراق إرشادات جديدة في PubMed",addOwn:"أضف بنفسك",add:"إضافة",suggest:"اطلب من الوكيل المزيد",ytNew:"أحدث فيديوهات يوتيوب حسب الموضوع",send:"إرسال",appName:"اسم التطبيق",theme:"المظهر",lookback:"المدة (أيام)",backup:"النسخ الاحتياطي والاستعادة",copy:"نسخ احتياطي",restore:"استعادة",close:"إغلاق",explain:"اشرح",open:"فتح",remove:"حذف",latest:"أحدث أبحاثه",findX:"ابحث في X",pubmed:"PubMed",save:"حفظ",unsave:"محفوظ",toTg:"أرسل إلى تيليجرام",noBrief:"اضغط «افحص PubMed الآن» ليقرأ الوكيل PubMed ويكتب ملخصًا.",noPapers:"لا توجد أبحاث بعد. اضغط «افحص PubMed الآن».",lastRun:"آخر فحص لـ PubMed",never:"لم يتم بعد",days:"يوم",ended:"انتهى",loopCap:"منحنى التدفق والحجم · الوكيل يتنفّس الأبحاث",reportsLede:"كل التقارير اليومية من وكيلك، مقسّمة إلى المواقع والإرشادات والأبحاث وتيليجرام. ابحث فيها جميعًا.",papersLede:"الجديد في PubMed لمواضيعك ومتابعاتك، مرتب حسب المجلة ونوع الدراسة.",guidesLede:"التقارير والإرشادات الكبرى، إضافة إلى أوراق الإرشادات والإجماع الجديدة من PubMed.",eventsLede:"مؤتمرات الصدرية ومواعيدها مع عدّ تنازلي. تأكد من التواريخ من الموقع الرسمي.",videosLede:"شروحات الإرشادات وتسجيلات المؤتمرات وأحدث فيديوهات يوتيوب لكل موضوع.",peopleLede:"أبرز الأطباء وراء الإرشادات. اضغط «أحدث أبحاثه» لجلب أعماله الجديدة.",booksLede:"المراجع الأساسية لاستشاري الصدرية. تحقق من وجود طبعة أحدث قبل الشراء.",sourcesLede:"جمعيات ومجلات ومواقع لتفتحها بنفسك. المواقع التي يتفقدها وكيلك كل صباح موجودة في صفحة الوكيل.",askLede:"اسأل بالعربية أو الإنجليزية. يبحث الوكيل في PubMed مباشرة ويذكر المراجع.",agentLede:"ما يقوم به وكيلك. التقرير اليومي يعمل كل صباح ومقسّم إلى أربعة أقسام. المتابعات المباشرة تعمل عند الضغط على «افحص PubMed الآن».",savedLede:"عناصر التقارير والأبحاث التي حفظتها، على كل أجهزتك.",liveWatches:"متابعات PubMed المباشرة",newWatch:"متابعة جديدة",newTask:"مهمة مجدولة جديدة",newTaskNote:"تظهر المهام الجديدة هنا فورًا. اطلب من Claude «فعّل مهمتي الجديدة» لتحديد موعدها.",taskHelp:"استخدم صيغة PubMed، مثل: sarcoidosis[ti] · \"Practice Guideline\"[pt] AND asthma",society:"الجمعيات",journal:"المجلات",news:"أخبار وتعليم",aiNote:"اقتراحات من معرفة الوكيل. تحقق من التواريخ والروابط.",noAI:"ميزات الذكاء الاصطناعي تحتاج ANTHROPIC_API_KEY في Vercel. التقارير وأبحاث PubMed والقوائم تعمل بدونه.",badPin:"الرمز غير صحيح أو مفقود. أدخل رمز التطبيق في الإعدادات.",greet:["صباح الخير د. أشرف.","مساء الخير د. أشرف.","مساء الخير د. أشرف."],heroSub:"إليك الجديد في طب الصدر.",thinking:"يفكر…",pin:"رمز التطبيق (يحمي التعديل والذكاء الاصطناعي وتيليجرام)",aiOn:"Claude متصل",aiOff:"Claude غير متصل: أضف ANTHROPIC_API_KEY في Vercel",syncOn:"متزامن بين أجهزتك",syncOff:"محفوظ على هذا الجهاز فقط",tgOn:"بوت تيليجرام متصل",tgNoChat:"تمت إضافة البوت: أرسل ‎/start‎ للبوت ثم أضف TELEGRAM_CHAT_ID",tgOff:"تيليجرام غير متصل: أضف TELEGRAM_BOT_TOKEN في Vercel",tgConnect:"ربط البوت",tgDone:"تم ربط البوت. افتح تيليجرام وأرسل ‎/start‎.",install:"تثبيت",runOne:"تشغيل",topicsT:"متابعة المواضيع",topicsD:"أبحاث PubMed الجديدة لكل موضوع مفعّل. يستخدم التقرير اليومي وفحص تيليجرام هذه المواضيع أيضًا.",guideT:"متابعة الإرشادات",guideD:"أوراق الإرشادات والإجماع والبيانات الرسمية في طب الصدر (آخر 90 يومًا).",editTopic:"أضف موضوعًا، مثل NTM",briefT:"اكتب ملخصًا بواسطة Claude بعد كل فحص",copied:"تم النسخ",restored:"تمت الاستعادة",offline:"أنت غير متصل. تُعرض آخر النتائج.",noReport:"لا يوجد تقرير بعد. ينشر وكيلك تقريرًا كل صباح.",topPick:"الأهم اليوم",all:"الكل",cat_websites:"المواقع",cat_guidelines:"الإرشادات",cat_papers:"الأبحاث",cat_telegram:"تيليجرام",catD_websites:"أخبار مواقع الجمعيات والتعليم في قائمتك",catD_guidelines:"الإرشادات والبيانات والتقارير الجديدة أو المحدّثة",catD_papers:"أهم الأبحاث الجديدة في مواضيعك",catD_telegram:"منشورات مهمة أو لافتة من قنوات تيليجرام العامة",practice:"يغيّر الممارسة",items:"عناصر",sentTg:"أُرسل إلى تيليجرام",websites:"المواقع التي يتفقدها الوكيل",addSite:"إضافة موقع",siteName:"الاسم",siteUrl:"https://",enabled:"نشطة",paused:"متوقفة",sectionsT:"أقسام التقرير",noSaved:"لا شيء محفوظ بعد. اضغط علامة الحفظ على أي عنصر أو بحث.",schedule:"الموعد",noResults:"لا توجد نتائج."}};
+const TABS=["home","reports","papers","guidelines","events","videos","people","books","ask","agent","saved","sources"];
+const HIDDEN=["report"];
+const CATS=["guidelines","papers","websites","telegram"];
+const TOPJ=["n engl j med","lancet","lancet respir med","am j respir crit care med","eur respir j","thorax","chest","jama","bmj","eur respir rev","ann am thorac soc","respirology","lancet infect dis","jama intern med","nat med","intensive care med","crit care med","erj open res","breathe","j allergy clin immunol","int j tuberc lung dis","lancet glob health"];
+const KEY="pulmo-agent-v2",PINKEY="pulmo-pin";
+const GUIDE_Q=`(guideline[Title] OR consensus[Title] OR "official statement"[Title] OR "Practice Guideline"[Publication Type]) AND (lung OR respiratory OR pulmonary OR asthma OR COPD OR bronchiectasis OR pleural OR tuberculosis OR sleep apnea)`;
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=u=>{u=String(u||"").trim();return /^https:\/\//i.test(u)?u:""};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const LL=v=>(v&&typeof v==="object")?(v[S.lang]||v.en||v.ar||""):(v||"");
+function fresh(){return{v:SEED_V,name:"Pulmonologist",lang:"en",theme:"system",days:14,topOnly:false,guideOn:1,brief:1,topics:clone(SEED.topics),watches:[],tasks:[],guidelines:clone(SEED.guidelines),watch:clone(SEED.watch),events:clone(SEED.events),videos:clone(SEED.videos),people:clone(SEED.people),books:clone(SEED.books),sources:clone(SEED.sources).filter(s=>s.kind!=="telegram"),removed:[],saved:[],run:null,edited:0}}
+function load(o){const s=Object.assign(fresh(),o||{});if((s.v||0)<SEED_V){for(const k of ["guidelines","watch","events","videos","people","books","sources"]){const have=new Set(s[k].map(x=>x.id));SEED[k].forEach(x=>{if(!have.has(x.id)&&!s.removed.includes(x.id)&&x.kind!=="telegram")s[k].push(clone(x))})}s.v=SEED_V}s.sources=s.sources.filter(x=>x.kind!=="telegram");s.tasks=(s.tasks||[]).map(fixTask);return s}
+function fixTask(k){k=Object.assign({},k);k.sources=(k.sources||[]).filter(x=>x.type!=="telegram"&&x.type!=="x");k.sections=Object.assign({websites:true,guidelines:true,papers:true,telegram:true},k.sections||{});return k}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw)S=load(JSON.parse(raw));else{const old=JSON.parse(localStorage.getItem("ma.saved")||"[]");if(Array.isArray(old))S.saved=old;const ol=JSON.parse(localStorage.getItem("ma.lang")||"null");if(ol)S.lang=ol}}catch(e){}
+let PIN="";try{PIN=localStorage.getItem(PINKEY)||JSON.parse(localStorage.getItem("ma.pin")||'""')||""}catch(e){}
+const t=k=>(T[S.lang]||T.en)[k]??T.en[k]??k;
+let aiOn=false,syncOn=false,tgOn=false,tgChat=false,saving=false,again=false,timer=null,ready=false;
+let INDEX=[];const DIG={};
 
-  // ---------- preferences ----------
-  const store = {
-    get(k, d) { try { const v = localStorage.getItem('ma.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-    set(k, v) { try { localStorage.setItem('ma.' + k, JSON.stringify(v)); } catch { /* private mode */ } }
-  };
-  const prefs = {
-    lang: store.get('lang', (navigator.language || 'en').startsWith('ar') ? 'ar' : 'en'),
-    theme: store.get('theme', 'system'),
-    pin: store.get('pin', '')
-  };
+/* ---------- server ---------- */
+async function api(path,opts={}){const r=await fetch(path,{method:opts.method||"GET",cache:"no-store",headers:{"Content-Type":"application/json","x-app-pin":PIN},body:opts.body?JSON.stringify(opts.body):undefined});let j={};try{j=await r.json()}catch(e){}if(!r.ok){const err=new Error(j.detail||j.error||("HTTP "+r.status));err.code=j.error||r.status;throw err}return j}
+function errMsg(e){if(!navigator.onLine)return t("offline");if(e&&e.code==="bad-pin")return t("badPin");if(e&&e.code==="no-key")return t("noAI");return(e&&e.message)||"Error"}
+async function ask(prompt,{system="",tools=false,maxTokens=1200,messages=null}={}){const j=await api("/api/claude",{method:"POST",body:{system,tools,maxTokens,messages:messages||[{role:"user",content:prompt}]}});return j.text||""}
+function persist(){S.edited=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(timer);timer=setTimeout(flush,1200)}
+async function flush(){if(!syncOn||!ready||!S.tasks.length)return;if(saving){again=true;return}saving=true;try{await api("/api/state",{method:"PUT",body:S})}catch(e){if(e.code==="bad-pin")toast(t("badPin"))}saving=false;if(again){again=false;flush()}}
+let tt;function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),2800)}
+async function toTelegram(text){try{await api("/api/telegram",{method:"POST",body:{action:"send",text}});toast(t("sentTg"))}catch(e){toast(errMsg(e))}}
 
-  // ---------- state ----------
-  const S = {
-    config: null,        // defaults from /data/config.json
-    tasks: [],           // effective tasks (cloud > local > config)
-    saved: store.get('saved', []),
-    index: [],           // digest index entries
-    digests: {},         // id -> digest
-    cloud: false,        // cloud storage available
-    filter: 'all',
-    installEvt: null
-  };
+/* ---------- dates ---------- */
+const DAY=864e5;
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const pd=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s||"");return m?new Date(+m[1],m[2]-1,+m[3]):null};
+const loc=()=>S.lang==="ar"?"ar-SA-u-nu-latn-ca-gregory":"en-GB";
+const fmtD=s=>{const d=pd(s);if(!d)return esc(s||"");return d.toLocaleDateString(loc(),{day:"numeric",month:"short",year:"numeric"})};
+const fmtT=ms=>new Date(ms).toLocaleString(loc(),{dateStyle:"medium",timeStyle:"short"});
+function evState(e){const s=pd(e.start),en=pd(e.end)||s,n=today();if(!s)return{d:9e9,txt:""};if(n>en)return{d:-1,txt:t("ended")};if(n>=s)return{d:0,txt:t("nowOn")};const d=Math.round((s-n)/DAY);return{d,txt:d+" "+t("days")}}
 
-  const $ = (s, r = document) => r.querySelector(s);
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const t = (k) => (I18N[prefs.lang] && I18N[prefs.lang][k]) || I18N.en[k] || k;
-  const L = (v) => (v && typeof v === 'object') ? (v[prefs.lang] || v.en || v.ar || '') : (v || '');
-  const uid = () => Math.random().toString(36).slice(2, 9);
+/* ---------- flow-volume loop picture ---------- */
+const svg=$("#loopSvg");
+function drawLoop(){const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return;const m=26,x0=m+8,x1=W-m,y0=H/2+8,top=m,bot=H-m-14;const X=v=>x0+(x1-x0)*v,Yp=f=>y0-(y0-top)*f,Yn=f=>y0+(bot-y0)*f;let p=`M${X(0)},${y0}`;for(let i=0;i<=60;i++){const v=i/60;const f=v<.12?Math.sin(v/.12*Math.PI/2):1-((v-.12)/.88)**0.9;p+=` L${X(v).toFixed(1)},${Yp(Math.max(f,0)).toFixed(1)}`}for(let i=60;i>=0;i--){const v=i/60;p+=` L${X(v).toFixed(1)},${Yn(Math.sin(Math.PI*v)*.62).toFixed(1)}`}let g="";for(let i=1;i<6;i++)g+=`<line x1="${X(i/6)}" y1="${top}" x2="${X(i/6)}" y2="${bot}" stroke="rgba(255,255,255,.12)"/>`;svg.innerHTML=`${g}<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="rgba(255,255,255,.45)"/><line x1="${x0}" y1="${top}" x2="${x0}" y2="${bot}" stroke="rgba(255,255,255,.45)"/><path id="trace" d="${p} Z" fill="rgba(255,94,77,.18)" stroke="#ff8a7d" stroke-width="3.5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="animation:draw 2.4s ease-out .2s forwards"/><text x="${x0+6}" y="${top+14}" fill="rgba(255,255,255,.8)" font-size="13">Flow</text><text x="${x1}" y="${y0-8}" fill="rgba(255,255,255,.8)" font-size="13" text-anchor="end">Volume</text>`}
+if(window.ResizeObserver){const loopRO=new ResizeObserver(drawLoop);loopRO.observe(svg)}else drawLoop();
 
-  // ---------- icons ----------
-  const ICON = {
-    today: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
-    archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/>',
-    saved: '<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/>',
-    tasks: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/>',
-    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
-    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
-    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
-    auto: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
-    ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
-    chev: '<path d="m9 6 6 6-6 6"/>',
-    back: '<path d="m15 6-6 6 6 6"/>',
-    plus: '<path d="M12 5v14M5 12h14"/>',
-    x: '<path d="M6 6l12 12M18 6 6 18"/>',
-    edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
-    refresh: '<path d="M20 11A8 8 0 0 0 6.3 5.7L4 8M4 4v4h4M4 13a8 8 0 0 0 13.7 5.3L20 16M20 20v-4h-4"/>',
-    download: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
-    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
-  };
-  const icon = (n, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+/* ---------- shell ---------- */
+function applyTheme(){const r=document.documentElement;if(S.theme==="light"||S.theme==="dark")r.dataset.theme=S.theme;else delete r.dataset.theme}
+function applyLang(){document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";$("#langBtn").textContent=S.lang==="ar"?"English":"العربية";document.querySelectorAll("[data-t]").forEach(el=>{el.textContent=t(el.dataset.t)});$("#brand").textContent=S.name||"Pulmonologist";document.title=S.name||"Pulmonologist";const h=new Date().getHours();$("#heroTitle").textContent=t("greet")[h<12?0:h<18?1:2]}
+function route(){let h=decodeURIComponent(location.hash.replace(/^#\/?/,""));const legacy={today:"home",archive:"reports",tasks:"agent"};if(legacy[h])h=legacy[h];if(/^digest\//.test(h))h="report/"+h.slice(7);const [v,arg]=[h.split("/")[0],h.split("/").slice(1).join("/")];if(TABS.includes(v)||HIDDEN.includes(v))return{v,arg};return{v:"home",arg:""}}
+function renderTabs(){const cur=route().v,act=cur==="report"?"reports":cur;$("#tabs").innerHTML=TABS.map(k=>`<a href="#${k}" ${k===act?'aria-current="page"':""}>${esc(t(k))}</a>`).join("");const a=$("#tabs [aria-current]");if(a&&a.scrollIntoView)a.scrollIntoView({block:"nearest",inline:"nearest"})}
+function show(){const {v,arg}=route();[...TABS,...HIDDEN].forEach(k=>$("#v-"+k).classList.toggle("on",k===v));document.body.classList.toggle("sub",v!=="home");renderTabs();if(v==="report")renderOneReport(arg)}
 
-  // ---------- theme & language ----------
-  function applyTheme() {
-    const dark = prefs.theme === 'dark' || (prefs.theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    $('meta[name="theme-color"]').setAttribute('content', dark ? '#0b1416' : '#0f766e');
-    $('#themeBtn').innerHTML = icon(prefs.theme === 'dark' ? 'moon' : prefs.theme === 'light' ? 'sun' : 'auto');
-  }
-  function applyLang() {
-    document.documentElement.lang = prefs.lang;
-    document.documentElement.dir = prefs.lang === 'ar' ? 'rtl' : 'ltr';
-    $('#langBtn').textContent = prefs.lang === 'ar' ? 'EN' : 'ع';
-    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
-    document.title = t('appName') + ' — ' + (prefs.lang === 'ar' ? 'My Agent' : 'وكيلي');
-  }
-  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
+/* ---------- agent reports (digests) ---------- */
+async function getJSON(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(u+" "+r.status);return r.json()}
+async function digest(e){if(DIG[e.id])return DIG[e.id];const d=await getJSON("/data/digests/"+e.file);DIG[e.id]=d;return d}
+const NOTHING=/^(no new updates|preview unavailable|couldn.t read)/i;
+function catOf(sec){return CATS.includes(sec.category)?sec.category:(sec.type==="telegram"?"telegram":"websites")}
+function dStats(d){let n=0,s=0;(d.sections||[]).forEach(x=>(x.items||[]).forEach(i=>{if(!NOTHING.test(LL(i.headline)||(i.headline&&i.headline.en)||"")){n++;if(i.star)s++}}));return{n,s}}
+const taskById=id=>S.tasks.find(x=>x.id===id);
+let repCat="all";
+function itemHTML(d,si,ii,it,source,cat){const key=`${d.id}#${si}#${ii}`,sv=S.saved.some(x=>x.key===key),u=safe(it.url),none=NOTHING.test((it.headline&&it.headline.en)||LL(it.headline));if(none)return`<div class="ritem none">${esc(LL(it.headline))}</div>`;const payload=esc(JSON.stringify({key,item:it,source,date:d.date,cat}));return`<div class="ritem ${it.star?"star":""}">${it.star?`<span class="badge hot">${esc(t("practice"))}</span>`:""}<div class="rh">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(LL(it.headline))}</a>`:esc(LL(it.headline))}</div>${it.summary?`<p>${esc(LL(it.summary))}</p>`:""}<div class="acts"><button class="btn star" type="button" aria-pressed="${sv}" data-saveitem="${esc(key)}" data-payload="${payload}">${sv?"★ "+esc(t("unsave")):"☆ "+esc(t("save"))}</button>${u?`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${esc(t("open"))}</a>`:""}${tgOn&&tgChat?`<button class="btn" type="button" data-tgitem="${payload}">${esc(t("toTg"))}</button>`:""}</div></div>`}
+const CICON={websites:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',guidelines:'<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 12h8M8 16h6"/>',papers:'<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>',telegram:'<path d="m21 4-18 7 6 2 2 6 3-4 5 4z"/><path d="m9 13 9-6"/>'};
+const cicon=c=>`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CICON[c]}</svg>`;
+function reportHTML(d,e,withLink){const task=taskById(d.taskId||e.taskId),{n,s}=dStats(d);const groups={};(d.sections||[]).forEach((sec,si)=>{(groups[catOf(sec)]||=[]).push([sec,si])});const counts=c=>(groups[c]||[]).reduce((a,[sec])=>a+(sec.items||[]).filter(i=>!NOTHING.test((i.headline&&i.headline.en)||LL(i.headline))).length,0);const present=CATS.filter(c=>groups[c]);const chips=`<div class="chips seg">${["all",...present].map(c=>`<button class="chip" type="button" data-repcat="${c}" aria-pressed="${repCat===c}">${c==="all"?esc(t("all")):cicon(c)+" "+esc(t("cat_"+c))}${c!=="all"?` <span class="cnt">${counts(c)}</span>`:""}</button>`).join("")}</div>`;const body=present.filter(c=>repCat==="all"||repCat===c).map(c=>`<div class="cat cat-${c}"><div class="cathead">${cicon(c)}<div><b>${esc(t("cat_"+c))}</b><span>${esc(t("catD_"+c))}</span></div></div>${groups[c].map(([sec,si])=>`<div class="srcblock"><div class="srcname">${esc(sec.source||"")}</div>${(sec.items||[]).map((it,ii)=>itemHTML(d,si,ii,it,sec.source,c)).join("")}</div>`).join("")}</div>`).join("");return`<div class="meta"><span class="badge">${esc(task?LL(task.name):(d.taskId||""))}</span><span>${fmtD(d.date)}</span><span>${n} ${esc(t("items"))}${s?` · ★ ${s}`:""}</span></div><h2 class="rtitle">${withLink?`<a href="#report/${encodeURIComponent(d.id)}">${esc(LL(d.title))}</a>`:esc(LL(d.title))}</h2>${d.topPick?`<div class="toppick"><b>${esc(t("topPick"))}</b><p>${esc(LL(d.topPick))}</p></div>`:""}${chips}${body}`}
+async function renderHomeReport(){const el=$("#homeReport");if(!INDEX.length){el.innerHTML=`<p class="empty">${esc(t("noReport"))}</p>`;$("#sItems").textContent="0";$("#sStars").textContent="0";return}const e=INDEX[0];try{const d=await digest(e);el.innerHTML=reportHTML(d,e,true);const {n,s}=dStats(d);$("#sItems").textContent=n;$("#sStars").textContent=s;$("#heroSub").textContent=LL(d.title)||t("heroSub")}catch(err){el.innerHTML=`<p class="empty">${esc(errMsg(err))}</p>`}}
+async function renderOneReport(id){const el=$("#reportOne");const e=INDEX.find(x=>x.id===id);if(!e){el.innerHTML=`<p class="empty">${esc(t("noResults"))}</p>`;return}el.innerHTML=`<p class="small">${esc(t("thinking"))}</p>`;try{el.innerHTML=reportHTML(await digest(e),e,false)}catch(err){el.innerHTML=`<p class="empty">${esc(errMsg(err))}</p>`}}
+let rq="",rqTimer;
+async function renderReports(){let list=INDEX;const q=rq.trim().toLowerCase();if(q){const hits=[];for(const e of INDEX){const hay=[e.title?.en,e.title?.ar,e.date].join(" ").toLowerCase();if(hay.includes(q)){hits.push(e);continue}try{const d=await digest(e);if(JSON.stringify(d).toLowerCase().includes(q))hits.push(e)}catch(x){}}list=hits}$("#reportList").innerHTML=list.length?list.map(e=>{const d=pd(e.date),task=taskById(e.taskId);return`<a class="item ev rrow" href="#report/${encodeURIComponent(e.id)}"><div class="cal"><b>${d?d.getDate():"?"}</b><span>${d?esc(d.toLocaleDateString(loc(),{month:"short"})):""}</span></div><div><div class="meta"><span>${esc(task?LL(task.name):e.taskId)}</span>${e.itemCount?`<span>${e.itemCount} ${esc(t("items"))}</span>`:""}${e.starCount?`<span class="badge hot">★ ${e.starCount}</span>`:""}</div><span class="ttl">${esc(LL(e.title))}</span></div></a>`}).join(""):`<p class="empty">${esc(t(q?"noResults":"noReport"))}</p>`}
 
-  // ---------- navigation ----------
-  const TABS = ['today', 'archive', 'saved', 'tasks', 'settings'];
-  function renderNav(active) {
-    const html = TABS.map((k) => `<a href="#/${k}" class="tab" ${k === active ? 'aria-current="page"' : ''}><span class="tab-ico">${icon(k)}</span>${t(k)}</a>`).join('');
-    $('#tabbar').innerHTML = html;
-    $('#nav').innerHTML = TABS.map((k) => `<a href="#/${k}" ${k === active ? 'aria-current="page"' : ''}>${icon(k)}${t(k)}</a>`).join('');
-    $('#syncBadge').textContent = `${t('cloud')}: ${S.cloud ? t('cloudOn') : t('cloudOff')}`;
-  }
+/* ---------- papers ---------- */
+function typeOf(a){const ty=(a.types||[]).join(" ").toLowerCase(),ti=(a.title||"").toLowerCase();if(/guideline/.test(ty)||/guideline|consensus|statement|recommendation/.test(ti))return"Guideline";if(/randomized controlled/.test(ty))return"RCT";if(/meta-analysis/.test(ty))return"Meta-analysis";if(/systematic review/.test(ty))return"Systematic review";if(/review/.test(ty))return"Review";return"Article"}
+const isTop=a=>TOPJ.includes((a.jabbr||a.journal||"").toLowerCase().replace(/\./g,""));
+function score(a){return(isTop(a)?3:0)+({Guideline:4,RCT:3,"Meta-analysis":2,"Systematic review":2,Review:1}[typeOf(a)]||0)}
+const pUrl=a=>a.doi?"https://doi.org/"+encodeURI(a.doi):"https://pubmed.ncbi.nlm.nih.gov/"+encodeURIComponent(a.pmid)+"/";
+function paperHTML(a,compact){const ty=typeOf(a),url=pUrl(a);const st=S.saved.some(x=>x.pmid===a.pmid);return`<article class="item"><div class="meta"><span class="badge ${ty==="Guideline"||ty==="RCT"?"hot":""}">${esc(ty)}</span>${isTop(a)?'<span class="badge ok">Top journal</span>':""}<span>${esc(a.journal)}</span><span>${fmtD(a.date)}</span>${a.topic?`<span>· ${esc(a.topic)}</span>`:""}</div><a class="ttl" href="${esc(url)}" target="_blank" rel="noopener">${esc(a.title)}</a><div class="small">${esc(a.authors)}${a.doi?` · DOI ${esc(a.doi)}`:""} · PMID ${esc(a.pmid)}</div>${!compact&&a.abstract?`<details><summary>Abstract</summary><p>${esc(a.abstract)}</p></details>`:""}<div class="acts"><button class="btn star" type="button" aria-pressed="${st}" data-star="${esc(a.pmid)}">${st?"★ "+esc(t("unsave")):"☆ "+esc(t("save"))}</button>${aiOn?`<button class="btn" type="button" data-explain="${esc(a.pmid)}">${esc(t("explain"))}</button>`:""}${tgOn&&tgChat&&!compact?`<button class="btn" type="button" data-tgpaper="${esc(a.pmid)}">${esc(t("toTg"))}</button>`:""}</div><div class="brief" data-exp-out="${esc(a.pmid)}"></div></article>`}
+const allPapers=()=>S.run?.papers||[];
+function renderHome(){const ps=allPapers().slice().sort((a,b)=>score(b)-score(a)||String(b.date).localeCompare(a.date));$("#homePapers").innerHTML=ps.length?ps.slice(0,4).map(a=>paperHTML(a,true)).join(""):`<p class="empty">${esc(t("noPapers"))}</p>`;$("#brief").innerHTML=S.run?.brief?md(S.run.brief):`<p class="empty">${esc(t(aiOn?"noBrief":"noAI"))}</p>`;const ev=S.events.map(e=>({e,s:evState(e)})).filter(x=>x.s.d>=0).sort((a,b)=>a.s.d-b.s.d);$("#homeEvents").innerHTML=ev.slice(0,3).map(x=>evHTML(x.e,x.s,true)).join("")||`<p class="empty">–</p>`;$("#sPapers").textContent=ps.length;const nx=ev[0];$("#sNext").textContent=nx?(nx.s.d===0?"●":nx.s.d):"–";$("#sNextL").textContent=nx?(nx.s.d===0?t("nowOn")+": "+nx.e.title:t("nextEvent")):t("nextEvent");if(!busy)$("#status").textContent=t("lastRun")+": "+(S.run?.at?fmtT(S.run.at):t("never"))}
+let pTopic="",pq="",busy=false;
+function renderPapers(){const tops=[...new Set(allPapers().map(a=>a.topic).filter(Boolean))];$("#pTopics").innerHTML=[["",t("all")],...tops.map(x=>[x,x])].map(([k,l])=>`<button class="chip" type="button" data-ptopic="${esc(k)}" aria-pressed="${pTopic===k}">${esc(l)}</button>`).join("");$("#topOnlyBtn").setAttribute("aria-pressed",S.topOnly);let ps=allPapers().slice();if(pTopic)ps=ps.filter(a=>a.topic===pTopic);if(S.topOnly)ps=ps.filter(isTop);if(pq){const q=pq.toLowerCase();ps=ps.filter(a=>(a.title+" "+a.journal+" "+a.authors).toLowerCase().includes(q))}ps.sort((a,b)=>score(b)-score(a)||String(b.date).localeCompare(a.date));$("#paperList").innerHTML=ps.length?ps.map(a=>paperHTML(a)).join(""):`<p class="empty">${esc(t("noPapers"))}</p>`}
 
-  function toast(msg) {
-    const el = $('#toast'); el.textContent = msg; el.classList.add('show');
-    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 1900);
-  }
+/* ---------- lists ---------- */
+const rm=(kind,id)=>`<button class="btn" type="button" data-rm="${kind}:${esc(id)}">${esc(t("remove"))}</button>`;
+function guideHTML(g,compact){const u=safe(g.url);return`<article class="item"><div class="meta"><span class="badge hot">${esc(g.org||"")}</span>${g.tag?`<span class="badge">${esc(g.tag)}</span>`:""}<span>${fmtD(g.date)}</span></div>${u?`<a class="ttl" href="${esc(u)}" target="_blank" rel="noopener">${esc(g.title)}</a>`:`<span class="ttl">${esc(g.title)}</span>`}${!compact&&g.note?`<p class="note">${esc(g.note)}</p>`:""}${compact?"":`<div class="acts">${u?`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${esc(t("open"))}</a>`:""}${rm("guidelines",g.id)}</div>`}</article>`}
+function renderGuides(){$("#guideList").innerHTML=S.guidelines.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(g=>guideHTML(g)).join("");$("#watchList").innerHTML=S.watch.map(w=>`<article class="item"><span class="ttl">${esc(w.title)}</span><p class="note">${esc(w.note)} · <a href="https://www.ersnet.org/research/task-forces" target="_blank" rel="noopener">ERS task forces</a></p></article>`).join("");const g=S.run?.guides||[];$("#pmGuides").innerHTML=g.length?g.map(a=>paperHTML(a)).join(""):`<p class="empty">${esc(t("noPapers"))}</p>`}
+function evHTML(e,s,compact){const d=pd(e.start),u=safe(e.url);const mo=d?d.toLocaleDateString(loc(),{month:"short"}):"";return`<article class="item ev"><div class="cal"><b>${d?d.getDate():"?"}</b><span>${esc(mo)} ${d?d.getFullYear():""}</span></div><div><div class="meta">${e.kind?`<span class="badge">${esc(e.kind)}</span>`:""}<span class="count">${esc(s.txt)}</span><span>${esc(e.place||"")}</span></div>${u?`<a class="ttl" href="${esc(u)}" target="_blank" rel="noopener">${esc(e.title)}</a>`:`<span class="ttl">${esc(e.title)}</span>`}<div class="small">${fmtD(e.start)}${e.end&&e.end!==e.start?" – "+fmtD(e.end):""}</div>${compact?"":`<div class="acts">${rm("events",e.id)}</div>`}</div></article>`}
+function renderEvents(){const ev=S.events.map(e=>({e,s:evState(e)})).sort((a,b)=>(a.s.d<0)-(b.s.d<0)||a.s.d-b.s.d);$("#eventList").innerHTML=ev.map(x=>evHTML(x.e,x.s)).join("")}
+const yt=q=>"https://www.youtube.com/results?search_query="+encodeURIComponent(q+" pulmonology")+"&sp=CAI%253D";
+function renderVideos(){$("#ytChips").innerHTML=S.topics.filter(x=>x.on).map(x=>`<a class="chip" style="display:inline-flex;align-items:center;text-decoration:none" href="${esc(yt(x.k))}" target="_blank" rel="noopener">▶ ${esc(x.k)}</a>`).join("");$("#videoList").innerHTML=S.videos.map(v=>{const u=safe(v.url);return`<article class="item"><div class="meta"><span class="badge">${esc(v.src||"")}</span><span>${esc(v.tag||"")}</span></div>${u?`<a class="ttl" href="${esc(u)}" target="_blank" rel="noopener">${esc(v.title)}</a>`:`<span class="ttl">${esc(v.title)}</span>`}<div class="acts">${u?`<a class="btn pri" href="${esc(u)}" target="_blank" rel="noopener">▶ ${esc(t("open"))}</a>`:""}${rm("videos",v.id)}</div></article>`}).join("")}
+function renderPeople(){$("#peopleList").innerHTML=S.people.map(p=>{const u=safe(p.url);return`<article class="item"><span class="ttl">${esc(p.name)}</span><p class="note">${esc(p.focus||"")}</p><div class="acts">${p.q?`<button class="btn pri" type="button" data-author="${esc(p.id)}">${esc(t("latest"))}</button><a class="btn" href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(p.q+"[Author]")}&sort=date" target="_blank" rel="noopener">${esc(t("pubmed"))}</a>`:""}<a class="btn" href="https://x.com/search?q=${encodeURIComponent(p.name)}&f=user" target="_blank" rel="noopener">${esc(t("findX"))}</a>${u?`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${esc(t("open"))}</a>`:""}${rm("people",p.id)}</div><div class="list" data-author-out="${esc(p.id)}" style="margin-top:10px"></div></article>`}).join("")}
+function renderBooks(){$("#bookList").innerHTML=S.books.map(b=>{const u=safe(b.url);return`<article class="item"><div class="meta"><span class="badge">${esc(b.ed||"")}</span></div>${u?`<a class="ttl" href="${esc(u)}" target="_blank" rel="noopener">${esc(b.title)}</a>`:`<span class="ttl">${esc(b.title)}</span>`}${b.note?`<p class="note">${esc(b.note)}</p>`:""}<div class="acts"><a class="btn" href="https://www.google.com/search?q=${encodeURIComponent(b.title+" latest edition")}" target="_blank" rel="noopener">${S.lang==="ar"?"تحقق من أحدث طبعة":"Check latest edition"}</a>${rm("books",b.id)}</div></article>`}).join("")}
+function renderSources(){$("#srcGroups").innerHTML=["society","journal","news"].map(k=>{const xs=S.sources.filter(s=>s.kind===k);return`<div class="sec"><h3>${esc(t(k))}</h3><div class="list">${xs.map(s=>{const u=safe(s.url);return`<article class="item row"><span class="ttl" style="flex:1">${esc(s.name)}</span>${u?`<a class="btn pri" href="${esc(u)}" target="_blank" rel="noopener">${esc(t("open"))}</a>`:""}${rm("sources",s.id)}</article>`}).join("")||'<p class="empty">–</p>'}</div></div>`}).join("")}
+function renderSaved(){const list=S.saved.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));$("#savedList").innerHTML=list.length?list.map(s=>{if(s.pmid)return paperHTML(s);const it=s.item||{},u=safe(it.url);return`<article class="item"><div class="meta">${s.cat?`<span class="badge">${esc(t("cat_"+s.cat))}</span>`:""}<span>${esc(s.source||"")}</span><span>${fmtD(s.date)}</span>${it.star?`<span class="badge hot">${esc(t("practice"))}</span>`:""}</div>${u?`<a class="ttl" href="${esc(u)}" target="_blank" rel="noopener">${esc(LL(it.headline))}</a>`:`<span class="ttl">${esc(LL(it.headline))}</span>`}<p class="note">${esc(LL(it.summary))}</p><div class="acts"><button class="btn star" type="button" aria-pressed="true" data-saveitem="${esc(s.key)}">★ ${esc(t("unsave"))}</button></div></article>`}).join(""):`<p class="empty">${esc(t("noSaved"))}</p>`}
 
-  // ---------- data ----------
-  async function getJSON(url) {
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(url + ' ' + r.status);
-    return r.json();
-  }
-  async function loadAll() {
-    const [config, index] = await Promise.all([
-      getJSON('/data/config.json').catch(() => ({ tasks: [] })),
-      getJSON('/data/digests/index.json').catch(() => ({ digests: [] }))
-    ]);
-    S.config = config;
-    S.index = (index.digests || []).slice().sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
-    // Local copy is used only if it holds edits that never reached the cloud.
-    S.tasks = (store.get('tasksDirty', false) && store.get('tasks', null)) || config.tasks || [];
-    try {
-      const r = await fetch('/api/state', { cache: 'no-store' });
-      if (r.ok) {
-        S.cloud = true;
-        const { state } = await r.json();
-        if (state && Array.isArray(state.tasks)) {
-          S.tasks = state.tasks;
-          if (Array.isArray(state.saved)) S.saved = mergeSaved(state.saved, S.saved);
-        }
-      }
-    } catch { S.cloud = false; }
-    store.set('tasks', S.tasks); store.set('saved', S.saved);
-  }
-  function mergeSaved(a, b) {
-    const m = new Map(); [...a, ...b].forEach((x) => x && x.key && m.set(x.key, x)); return [...m.values()];
-  }
-  async function digest(entry) {
-    if (S.digests[entry.id]) return S.digests[entry.id];
-    const d = await getJSON('/data/digests/' + entry.file);
-    S.digests[entry.id] = d; return d;
-  }
-  async function persist() {
-    store.set('tasks', S.tasks); store.set('saved', S.saved); store.set('tasksDirty', true);
-    if (!S.cloud) { toast(t('localOnly')); return; }
-    try {
-      const r = await fetch('/api/state', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-app-pin': prefs.pin || '' },
-        body: JSON.stringify({ tasks: S.tasks, saved: S.saved })
-      });
-      if (r.status === 401) { toast(t('wrongPin')); return; }
-      if (r.ok) store.set('tasksDirty', false);
-      toast(r.ok ? t('syncedCloud') : t('localOnly'));
-    } catch { toast(t('localOnly')); }
-  }
-  const taskById = (id) => S.tasks.find((x) => x.id === id);
+/* ---------- agent tab ---------- */
+const sw=(on,attr)=>`<button class="switch" type="button" role="switch" aria-checked="${!!on}" ${attr} aria-label="On/off"></button>`;
+function renderAgent(){const tasks=S.tasks.map(k=>`<article class="item agentcard"><div class="task"><div><div class="meta"><span class="badge ${k.enabled?"ok":""}">${esc(t(k.enabled?"enabled":"paused"))}</span>${k.schedule?`<span>${esc(LL(k.schedule))}</span>`:""}</div><span class="ttl">${esc(LL(k.name))}</span><p class="note">${esc(LL(k.description))}</p></div>${sw(k.enabled,`data-agenton="${esc(k.id)}"`)}</div><h4>${esc(t("sectionsT"))}</h4><div class="secgrid">${CATS.map(c=>`<button class="secbtn" type="button" data-agentsec="${esc(k.id)}|${c}" aria-pressed="${!!k.sections[c]}">${cicon(c)}<span><b>${esc(t("cat_"+c))}</b><small>${esc(t("catD_"+c))}</small></span></button>`).join("")}</div>${k.sections.websites?`<h4>${esc(t("websites"))} · ${k.sources.length}</h4><div class="list">${k.sources.map(s=>`<div class="srow"><a href="${esc(safe(s.url)||"#")}" target="_blank" rel="noopener">${esc(s.name)}</a><span class="small">${esc((s.url||"").replace(/^https?:\/\//,""))}</span><button class="btn" type="button" data-delsite="${esc(k.id)}|${esc(s.id)}">${esc(t("remove"))}</button></div>`).join("")}</div><form class="add" data-addsite="${esc(k.id)}"><input name="name" required placeholder="${esc(t("siteName"))}"><input name="url" required placeholder="https://"><button class="btn pri">${esc(t("addSite"))}</button></form>`:""}${k.id!=="daily-digest"&&k.id!=="daily-report"?`<div class="acts">${rm("tasks",k.id)}</div>`:""}</article>`).join("");$("#agentTasks").innerHTML=tasks||`<p class="empty">–</p>`;renderTasks()}
+function renderTasks(){const topicChips=S.topics.map((x,i)=>`<button class="chip" type="button" data-topic="${i}" aria-pressed="${!!x.on}">${esc(x.k)}</button>`).join("");const on=S.topics.some(x=>x.on);let h=`<article class="item"><div class="task"><div><span class="ttl">${esc(t("topicsT"))}</span><p class="note">${esc(t("topicsD"))}</p></div>${sw(on,'data-alltopics="1"')}</div><div class="chips" style="margin-top:10px">${topicChips}</div><div class="row" style="margin-top:10px"><input id="newTopic" placeholder="${esc(t("editTopic"))}" style="flex:1;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg)"><button class="btn" type="button" id="addTopic">${esc(t("add"))}</button><button class="btn" type="button" data-runtask="topics">${esc(t("runOne"))}</button></div></article>`;h+=`<article class="item"><div class="task"><div><span class="ttl">${esc(t("guideT"))}</span><p class="note">${esc(t("guideD"))}</p></div>${sw(S.guideOn,'data-guideon="1"')}</div><div class="acts"><button class="btn" type="button" data-runtask="guides">${esc(t("runOne"))}</button></div></article>`;h+=`<article class="item"><div class="task"><div><span class="ttl">${esc(t("briefT"))}</span><p class="note">${esc(aiOn?t("aiOn"):t("aiOff"))}</p></div>${sw(S.brief,'data-briefon="1"')}</div></article>`;h+=S.watches.map(k=>`<article class="item"><div class="task"><div><span class="ttl">${esc(k.name)}</span><p class="q">${esc(k.term)}</p><div class="small">${esc(k.days)} ${esc(t("days"))}${k.last?` · ${esc(t("lastRun"))}: ${fmtT(k.last)} · ${esc(k.count||0)}`:""}</div></div>${sw(k.on,`data-taskon="${esc(k.id)}"`)}</div><div class="acts"><button class="btn" type="button" data-runtask="${esc(k.id)}">${esc(t("runOne"))}</button>${rm("watches",k.id)}</div></article>`).join("");$("#taskList").innerHTML=h}
+function renderStatus(){$("#aiDot").className="dot"+(aiOn?" ok":"");$("#aiMsg").textContent=aiOn?t("aiOn"):t("aiOff");$("#syncDot").className="dot"+(syncOn?" ok":"");$("#syncMsg").textContent=syncOn?t("syncOn"):t("syncOff");$("#tgDot").className="dot"+(tgOn&&tgChat?" ok":"");$("#tgMsg").textContent=tgOn?(tgChat?t("tgOn"):t("tgNoChat")):t("tgOff");$("#tgSetup").style.display=tgOn?"":"none"}
+function renderAll(){applyTheme();applyLang();show();renderHome();renderHomeReport();renderReports();renderPapers();renderGuides();renderEvents();renderVideos();renderPeople();renderBooks();renderSources();renderSaved();renderAgent();renderQuick();renderStatus()}
+function md(s){const lines=esc(s).split(/\n/);let h="",inUl=false;for(let l of lines){l=l.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");if(/^\s*[-•*]\s+/.test(l)){if(!inUl){h+="<ul>";inUl=true}h+="<li>"+l.replace(/^\s*[-•*]\s+/,"")+"</li>";continue}if(inUl){h+="</ul>";inUl=false}if(/^#{1,4}\s/.test(l))h+="<h4>"+l.replace(/^#+\s/,"")+"</h4>";else if(l.trim())h+="<p>"+l+"</p>"}if(inUl)h+="</ul>";return h}
 
-  // ---------- formatting ----------
-  const locale = () => (prefs.lang === 'ar' ? 'ar-SA-u-nu-latn-ca-gregory' : 'en-GB');
-  const fmtDate = (iso, opts) => new Date(iso + (iso.length === 10 ? 'T12:00:00' : '')).toLocaleDateString(locale(), opts || { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  function greeting() {
-    const h = new Date().getHours();
-    return `${t(h < 12 ? 'goodMorning' : h < 18 ? 'goodAfternoon' : 'goodEvening')}, ${t('doctor')}`;
-  }
-  function srcType(sec) {
-    if (sec.type) return sec.type;
-    const s = S.tasks.flatMap((x) => x.sources || []).find((x) => x.id === sec.sourceId);
-    return s ? s.type : 'website';
-  }
-  const initials = (name) => {
-    const first = String(name || '').trim().split(/[\s|—-]+/)[0] || '';
-    if (/^[A-Z]{2,4}$/.test(first)) return first; // ATS, GOLD, ERS…
-    return initials2(name);
-  };
-  const initials2 = (name) => (name || '?').replace(/[^\p{L}\p{N} ]/gu, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '•';
+/* ---------- live PubMed run ---------- */
+function plan(only){const list=[];if(!only||only==="topics")S.topics.filter(x=>x.on).forEach(x=>list.push({term:`(${x.k}[Title/Abstract]) AND english[Language]`,days:S.days,max:10,tag:x.k}));if((!only&&S.guideOn)||only==="guides")list.push({term:GUIDE_Q,days:90,max:15,tag:"__guide"});S.watches.forEach(k=>{if((!only&&k.on)||only===k.id)list.push({term:k.term,days:k.days,max:15,tag:"__task:"+k.id})});return list}
+async function runAgent(only){if(busy)return;const list=plan(typeof only==="string"?only:"");if(!list.length){toast(S.lang==="ar"?"لا توجد متابعات مفعلة":"No watches switched on");return}busy=true;const btn=$("#runBtn"),st=$("#status");btn.disabled=true;btn.querySelector("span").textContent=t("running");st.textContent=`${t("running")} ${list.length} ${S.lang==="ar"?"عمليات بحث":"searches"}`;try{const r=await api("/api/pubmed",{method:"POST",body:{searches:list}});const papers=[],guides=[];for(const a of r.papers||[]){if(a.topic==="__guide")guides.push({...a,topic:"Guideline"});else if(a.topic.startsWith("__task:")){const k=S.watches.find(x=>"__task:"+x.id===a.topic);papers.push({...a,topic:k?k.name:""})}else papers.push(a)}S.watches.forEach(k=>{if(list.some(s=>s.tag==="__task:"+k.id)){k.last=Date.now();k.count=papers.filter(a=>a.topic===k.name).length}});const prev=S.run||{};if(typeof only==="string"&&only){const keep=(prev.papers||[]).filter(a=>!papers.some(b=>b.pmid===a.pmid));S.run={at:Date.now(),papers:[...papers,...keep].slice(0,150),guides:only==="guides"?guides:(prev.guides||[]),brief:prev.brief||""}}else S.run={at:Date.now(),papers:papers.slice(0,150),guides,brief:prev.brief||""};persist();renderAll();if(aiOn&&S.brief){st.textContent=t("thinking");await writeBrief()}}catch(e){st.textContent=errMsg(e)}busy=false;btn.disabled=false;btn.querySelector("span").textContent=t("run");renderHome()}
+const guideCtx=()=>S.guidelines.map(g=>`- ${g.title} (${g.org}, ${g.date}): ${g.note||""}`).join("\n");
+const langLine=()=>S.lang==="ar"?"Arabic (Modern Standard; keep drug names, trial names and abbreviations in English)":"English";
+async function writeBrief(){const ps=allPapers().slice().sort((a,b)=>score(b)-score(a)).slice(0,20);const gs=(S.run.guides||[]).slice(0,8);const prompt=`You are "${S.name}", a respiratory-medicine update agent for a consultant pulmonologist. Today is ${new Date().toDateString()}.
+Write a briefing in ${langLine()}. Use only the records below; do not invent studies. Format: a one-line headline, then "## Practice-changing or notable" (3–6 bullets: what was found, why it matters clinically, journal, PMID), then "## Guidelines and consensus" (bullets, or say none new), then "## One to read in full" (one paper and why). Bold key drugs and outcomes with **. Under 330 words.
+NEW PAPERS:
+${ps.map(a=>`PMID ${a.pmid} | ${a.journal} | ${typeOf(a)} | ${a.topic} | ${a.title} | ${String(a.abstract||"").slice(0,500)}`).join("\n")||"none"}
+NEW GUIDELINE/CONSENSUS PAPERS (last 90 days):
+${gs.map(a=>`PMID ${a.pmid} | ${a.journal} | ${a.title}`).join("\n")||"none"}`;const el=$("#brief");el.textContent=t("thinking");try{const text=await ask(prompt,{maxTokens:1100});S.run.brief=text;persist();el.innerHTML=md(text)}catch(e){el.textContent=errMsg(e)}}
+async function explain(pmid,out){const a=[...allPapers(),...(S.run?.guides||[]),...S.saved].find(x=>x.pmid===pmid);if(!a)return;out.textContent=t("thinking");try{const text=await ask(`Explain this paper to a consultant pulmonologist in ${langLine()}, in at most 120 words: design and population, main result with numbers if given, clinical implication, and one limitation. Use only the abstract; say if information is missing.\nTitle: ${a.title}\nJournal: ${a.journal}\nAbstract: ${a.abstract||"(no abstract)"}`,{maxTokens:500});out.innerHTML=md(text)}catch(e){out.textContent=errMsg(e)}}
+async function authorPapers(p,out){out.innerHTML=`<p class="small">${esc(t("running"))}</p>`;try{const r=await api("/api/pubmed?term="+encodeURIComponent(p.q+"[Author]")+"&days=365&max=5");const ps=r.papers||[];out.innerHTML=ps.length?ps.map(a=>paperHTML(a,true)).join(""):'<p class="empty">No papers in the last year.</p>'}catch(e){out.innerHTML=`<p class="empty">${esc(errMsg(e))}</p>`}}
 
-  // ---------- item rendering ----------
-  function itemKey(d, si, ii) { return `${d.id}#${si}#${ii}`; }
-  const isSaved = (key) => S.saved.some((x) => x.key === key);
+/* ---------- suggestions ---------- */
+const SUGG={events:"upcoming (after today) international or regional respiratory, critical care or sleep medicine conferences, including Middle East, Gulf and Saudi meetings. Fields: title, start (YYYY-MM-DD or empty if unsure), place, url (official https site or empty), detail",videos:"high-quality respiratory medicine video channels, lecture series or recorded guideline webinars. Fields: title, src (channel), url (https or empty), detail",people:"respiratory physicians and scientists worth following (guideline authors, educators, including Arab and Gulf pulmonologists). Fields: name, focus, q (PubMed author format like 'Smith JD' or empty), detail",books:"important recent respiratory, critical care, sleep, imaging or pulmonary function books. Fields: title, ed (edition/year if known), detail"};
+const parseJSON=s=>{const m=/\[[\s\S]*\]/.exec(s||"");try{return m?JSON.parse(m[0]):[]}catch(e){return[]}};
+const suggData={};
+async function suggest(kind){const out=$("#sugg-"+kind);if(!aiOn){out.innerHTML=`<p class="empty">${esc(t("noAI"))}</p>`;return}out.innerHTML=`<p class="small">${esc(t("thinking"))}</p>`;const have=(S[kind]||[]).map(x=>x.title||x.name).join("; ");try{const text=await ask(`Today is ${new Date().toDateString()}. Suggest 6 ${SUGG[kind]}. Exclude: ${have}. Return only a JSON array of objects with those fields, no other text. Leave a field empty rather than guess a date or URL.`,{maxTokens:1500});const arr=parseJSON(text).slice(0,8);suggData[kind]=arr;out.innerHTML=`<p class="small">${esc(t("aiNote"))}</p>`+arr.map((x,i)=>{const u=safe(x.url);return`<article class="item sugg"><span class="ttl">${esc(x.title||x.name||"")}</span><div class="meta">${x.start?`<span>${fmtD(x.start)}</span>`:""}${x.place?`<span>${esc(x.place)}</span>`:""}${x.ed?`<span>${esc(x.ed)}</span>`:""}${x.src?`<span>${esc(x.src)}</span>`:""}${x.focus?`<span>${esc(x.focus)}</span>`:""}</div><p class="note">${esc(x.detail||"")}</p><div class="acts"><button class="btn pri" type="button" data-adds="${kind}:${i}">${esc(t("add"))}</button>${u?`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${esc(t("open"))}</a>`:""}</div></article>`}).join("")}catch(e){out.innerHTML=`<p class="empty">${esc(errMsg(e))}</p>`}}
 
-  function renderItem(item, key, sourceName, date) {
-    const saved = isSaved(key);
-    return `<div class="item ${item.star ? 'star' : ''}">
-      <div class="item-body">
-        ${item.star ? `<div class="star-tag">⭐ ${t('practiceChanging')}</div>` : ''}
-        <h3>${esc(L(item.headline))}</h3>
-        <p>${esc(L(item.summary))}</p>
-      </div>
-      <div class="item-actions">
-        <button class="mini-btn" data-save="${esc(key)}" aria-pressed="${saved}" aria-label="${t(saved ? 'unsave' : 'save')}"
-          data-payload="${esc(JSON.stringify({ key, item, source: sourceName, date }))}">${icon('saved', saved)}</button>
-        ${item.url ? `<a class="mini-btn" href="${esc(item.url)}" target="_blank" rel="noopener" aria-label="${t('open')}">${icon('ext')}</a>` : ''}
-      </div>
-    </div>`;
-  }
+/* ---------- chat ---------- */
+let convo=[];
+function renderChat(){$("#chat").innerHTML=convo.length?convo.map(m=>`<div class="msg ${m.role==="user"?"u":"a"}">${m.role==="user"?esc(m.content):md(m.content)}</div>`).join(""):`<p class="empty">${esc(t("askLede"))}</p>`}
+function renderQuick(){const qs=S.lang==="ar"?["ما الجديد في تقرير GOLD 2027؟","أحدث التجارب العشوائية في توسع القصبات","متى أبدأ العلاج البيولوجي في الربو الشديد؟"]:["What changed in GOLD 2027?","Latest RCTs in bronchiectasis this month","New evidence on outpatient PE management"];$("#quickAsk").innerHTML=qs.map(q=>`<button class="chip" type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}
+async function askAgent(q){if(!q.trim())return;convo.push({role:"user",content:q});convo.push({role:"assistant",content:t("thinking"),pending:1});renderChat();if(!aiOn){convo[convo.length-1]={role:"assistant",content:t("noAI")};renderChat();return}let rep="";try{if(INDEX[0]){const d=await digest(INDEX[0]);rep=(d.sections||[]).flatMap(s=>(s.items||[]).map(i=>`- [${catOf(s)}] ${s.source}: ${(i.headline&&i.headline.en)||""}`)).slice(0,30).join("\n")}}catch(e){}const system=`You are "${S.name}", an AI agent that keeps a consultant pulmonologist up to date on respiratory medicine (guidelines, papers, books, conferences, videos, Telegram). Today is ${new Date().toDateString()}. Answer in the language of the question (Arabic answers keep drug and trial names in English). Be concise and clinical. Use the pubmed_search tool for anything about recent evidence and cite PMIDs and DOIs from its results; never invent references.\nKnown recent guideline context:\n${guideCtx()}\nLatest agent report (${INDEX[0]?INDEX[0].date:"none"}):\n${rep}`;const msgs=convo.filter(m=>!m.pending).slice(-10).map(m=>({role:m.role,content:m.content}));while(msgs.length&&msgs[0].role!=="user")msgs.shift();try{const text=await ask("",{system,tools:true,maxTokens:1600,messages:msgs});convo[convo.length-1]={role:"assistant",content:text||"—"}}catch(e){convo[convo.length-1]={role:"assistant",content:errMsg(e)}}renderChat()}
 
-  function renderDigest(d) {
-    const task = taskById(d.taskId);
-    const secs = (d.sections || []).map((sec, si) => {
-      const type = srcType(sec);
-      return `<section class="card source-card">
-        <div class="source-head">
-          <div class="source-logo ${type === 'telegram' ? 'tg' : type === 'x' ? 'x' : ''}">${esc(initials(sec.source))}</div>
-          <div class="source-name">${esc(sec.source)}</div>
-        </div>
-        ${(sec.items || []).map((it, ii) => renderItem(it, itemKey(d, si, ii), sec.source, d.date)).join('')}
-      </section>`;
-    }).join('');
-    const pick = d.topPick ? `<div class="top-pick"><div class="badge">★</div><div><strong>${t('topPick')}</strong><p>${esc(L(d.topPick))}</p></div></div>` : '';
-    return `${pick}${secs}${task ? '' : ''}`;
-  }
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{const b=e.target.closest("button,a");if(!b)return;const d=b.dataset;
+if(d.star){const id=d.star,i=S.saved.findIndex(x=>x.pmid===id);if(i>=0)S.saved.splice(i,1);else{const a=[...allPapers(),...(S.run?.guides||[])].find(x=>x.pmid===id);if(a)S.saved.unshift({...a,date:a.date})}persist();renderHome();renderPapers();renderGuides();renderSaved()}
+else if(d.saveitem){const key=d.saveitem,i=S.saved.findIndex(x=>x.key===key);if(i>=0)S.saved.splice(i,1);else if(d.payload)S.saved.unshift(JSON.parse(d.payload));persist();renderSaved();renderHomeReport();const r=route();if(r.v==="report")renderOneReport(r.arg)}
+else if(d.tgitem){const p=JSON.parse(d.tgitem),it=p.item||{};toTelegram(`**${LL(it.headline)}**\n${LL(it.summary)}\n${p.source||""}${it.url?"\n"+it.url:""}`)}
+else if(d.tgpaper){const a=[...allPapers(),...(S.run?.guides||[]),...S.saved].find(x=>x.pmid===d.tgpaper);if(a)toTelegram(`**${a.title}**\n${a.journal}, ${a.date} · ${typeOf(a)}\n${pUrl(a)}`)}
+else if(d.repcat){repCat=d.repcat;renderHomeReport();const r=route();if(r.v==="report")renderOneReport(r.arg)}
+else if(d.explain){explain(d.explain,b.closest("article").querySelector("[data-exp-out]"))}
+else if(d.rm){const i=d.rm.indexOf(":"),k=d.rm.slice(0,i),id=d.rm.slice(i+1);S[k]=S[k].filter(x=>x.id!==id);if(!S.removed.includes(id))S.removed.push(id);persist();renderAll()}
+else if(d.ptopic!==undefined){pTopic=d.ptopic;renderPapers()}
+else if(d.author){const p=S.people.find(x=>x.id===d.author);if(p)authorPapers(p,b.closest("article").querySelector("[data-author-out]"))}
+else if(d.suggest){suggest(d.suggest)}
+else if(d.adds){const[k,i]=d.adds.split(":");const x=(suggData[k]||[])[+i];if(x){const o={id:"u-"+uid()};if(k==="events")Object.assign(o,{title:x.title||"",start:x.start||"",end:x.start||"",place:x.place||"",url:safe(x.url)});if(k==="videos")Object.assign(o,{title:x.title||"",src:x.src||"",url:safe(x.url),tag:""});if(k==="people")Object.assign(o,{name:x.name||"",focus:x.focus||x.detail||"",q:x.q||""});if(k==="books")Object.assign(o,{title:x.title||"",ed:x.ed||"",note:x.detail||""});S[k].push(o);persist();renderAll();b.disabled=true;toast("✓")}}
+else if(d.q){askAgent(d.q)}
+else if(d.topic!==undefined){const tp=S.topics[+d.topic];tp.on=tp.on?0:1;persist();renderTasks();renderVideos()}
+else if(d.alltopics){const on=!S.topics.some(x=>x.on);S.topics.forEach(x=>x.on=on?1:0);persist();renderTasks();renderVideos()}
+else if(d.guideon){S.guideOn=S.guideOn?0:1;persist();renderTasks()}
+else if(d.briefon){S.brief=S.brief?0:1;persist();renderTasks()}
+else if(d.taskon){const k=S.watches.find(x=>x.id===d.taskon);if(k){k.on=k.on?0:1;persist();renderTasks()}}
+else if(d.agenton){const k=taskById(d.agenton);if(k){k.enabled=!k.enabled;persist();renderAgent()}}
+else if(d.agentsec){const[id,c]=d.agentsec.split("|"),k=taskById(id);if(k){k.sections[c]=!k.sections[c];persist();renderAgent()}}
+else if(d.delsite){const[id,sid]=d.delsite.split("|"),k=taskById(id);if(k){k.sources=k.sources.filter(s=>s.id!==sid);persist();renderAgent()}}
+else if(d.runtask){location.hash="#home";runAgent(d.runtask)}
+else if(b.id==="addTopic"){const inp=$("#newTopic"),v=inp.value.trim();if(v&&!S.topics.some(x=>x.k.toLowerCase()===v.toLowerCase())){S.topics.push({k:v,on:1});persist();renderTasks();renderVideos()}}
+});
+document.addEventListener("submit",e=>{const f=e.target;if(f.dataset.addsite){e.preventDefault();const k=taskById(f.dataset.addsite);if(!k)return;const fd=new FormData(f);let url=String(fd.get("url")).trim();if(!/^https?:\/\//i.test(url))url="https://"+url;k.sources.push({id:uid(),type:"website",name:String(fd.get("name")).trim(),url});persist();renderAgent();toast("✓")}});
+$("#runBtn").addEventListener("click",()=>runAgent());
+$("#langBtn").addEventListener("click",()=>{S.lang=S.lang==="ar"?"en":"ar";persist();renderAll();renderChat()});
+$("#topOnlyBtn").addEventListener("click",()=>{S.topOnly=!S.topOnly;persist();renderPapers()});
+$("#pq").addEventListener("input",e=>{pq=e.target.value;renderPapers()});
+$("#rq").addEventListener("input",e=>{rq=e.target.value;clearTimeout(rqTimer);rqTimer=setTimeout(renderReports,250)});
+$("#askForm").addEventListener("submit",e=>{e.preventDefault();const v=$("#askIn").value;$("#askIn").value="";askAgent(v)});
+$("#askIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("#askForm").requestSubmit()}});
+$("#taskForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target,fd=new FormData(f);S.watches.push({id:"w-"+uid(),name:String(fd.get("name")).trim(),term:String(fd.get("term")).trim(),days:+fd.get("days")||14,on:1});f.reset();persist();renderTasks();toast("✓")});
+$("#agentForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target,fd=new FormData(f),both=v=>({en:v,ar:v});S.tasks.push(fixTask({id:"task-"+uid(),icon:"",name:both(String(fd.get("name")).trim()),description:both(String(fd.get("desc")).trim()),schedule:both(String(fd.get("schedule")||"").trim()),enabled:true,sources:[]}));f.reset();persist();renderAgent();toast("✓")});
+document.querySelectorAll("form.add[data-kind]").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();const k=f.dataset.kind,o={id:"u-"+uid()};new FormData(f).forEach((v,n)=>{o[n]=String(v).trim()});if(k==="events"&&!o.end)o.end=o.start;S[k].unshift(o);persist();f.reset();renderAll();toast("✓")}));
+$("#setBtn").addEventListener("click",()=>{$("#fName").value=S.name;$("#fDays").value=String(S.days);$("#fTheme").value=S.theme||"system";$("#fPin").value=PIN;renderStatus();try{$("#dlg").showModal()}catch(e){$("#dlg").setAttribute("open","")}});
+$("#fName").addEventListener("change",e=>{S.name=e.target.value.trim()||"Pulmonologist";persist();applyLang()});
+$("#fDays").addEventListener("change",e=>{S.days=+e.target.value||14;persist()});
+$("#fTheme").addEventListener("change",e=>{S.theme=e.target.value;persist();applyTheme()});
+$("#fPin").addEventListener("change",e=>{PIN=e.target.value.trim();try{localStorage.setItem(PINKEY,PIN)}catch(x){}boot()});
+$("#tgSetup").addEventListener("click",async()=>{try{const j=await api("/api/telegram?action=setup&pin="+encodeURIComponent(PIN));toast(j.ok?t("tgDone"):(j.telegram||"Telegram error"))}catch(e){toast(errMsg(e))}});
+$("#copyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(JSON.stringify(S));$("#copyMsg").textContent=t("copied")}catch(e){$("#impTxt").value=JSON.stringify(S);$("#copyMsg").textContent="Select the text below and copy it"}});
+$("#impBtn").addEventListener("click",()=>{try{const o=JSON.parse($("#impTxt").value);if(o&&o.topics){S=load(o);persist();renderAll();$("#copyMsg").textContent=t("restored")}}catch(e){$("#copyMsg").textContent="That backup could not be read"}});
+window.addEventListener("hashchange",()=>{show();window.scrollTo({top:0})});
+if(window.matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",applyTheme);
 
-  function digestStats(d) {
-    let n = 0, s = 0; (d.sections || []).forEach((x) => (x.items || []).forEach((i) => { n++; if (i.star) s++; }));
-    return { n, s };
-  }
+/* ---------- install (PWA) ---------- */
+let deferred=null;const bar=$("#installBar");
+const standalone=()=>(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone;
+let dismissed=false;try{dismissed=localStorage.getItem("pulmo-install-x")==="1"}catch(e){}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;if(!dismissed&&!standalone())bar.classList.add("on")});
+if(!dismissed&&!standalone()&&/iphone|ipad|ipod/i.test(navigator.userAgent)){bar.classList.add("on");$("#installBtn").style.display="none";$("#installTxt").textContent=S.lang==="ar"?"للتثبيت على iPhone: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».":"To install on iPhone: tap Share, then “Add to Home Screen”."}
+$("#installBtn").addEventListener("click",async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;bar.classList.remove("on")});
+$("#installX").addEventListener("click",()=>{bar.classList.remove("on");try{localStorage.setItem("pulmo-install-x","1")}catch(e){}});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
 
-  // ---------- views ----------
-  const V = {};
-
-  V.today = async () => {
-    const chips = S.tasks.length > 1 ? `<div class="chips">${[{ id: 'all', name: { en: t('allTasks'), ar: t('allTasks') }, icon: '' }, ...S.tasks].map((x) =>
-      `<button class="chip" data-filter="${esc(x.id)}" aria-pressed="${S.filter === x.id}">${esc((x.icon ? x.icon + ' ' : '') + L(x.name))}</button>`).join('')}</div>` : '';
-    const list = S.index.filter((e) => S.filter === 'all' || e.taskId === S.filter);
-    if (!list.length) {
-      return `<p class="eyebrow">${esc(fmtDate(new Date().toISOString().slice(0, 10)))}</p><h1 class="page-title">${esc(greeting())}</h1>${chips}
-        <div class="card empty"><div class="big">🌤️</div>${t('noDigests')}</div>`;
-    }
-    // latest digest per task (or latest overall when filtered)
-    const latest = [];
-    const seen = new Set();
-    for (const e of list) { if (!seen.has(e.taskId)) { seen.add(e.taskId); latest.push(e); } }
-    const blocks = [];
-    for (const e of latest) {
-      const d = await digest(e);
-      const task = taskById(e.taskId);
-      const { n, s } = digestStats(d);
-      blocks.push(`<div class="hero fade-in">
-          <div class="eyebrow">${esc(task ? (task.icon || '') + ' ' + L(task.name) : t('latestDigest'))} · ${esc(fmtDate(d.date, { day: 'numeric', month: 'short' }))}</div>
-          <h1>${esc(L(d.title))}</h1>
-          <div class="hero-stats"><span class="pill">${n} ${t('items')}</span>${s ? `<span class="pill">⭐ ${s} ${t('starred')}</span>` : ''}</div>
-        </div>${renderDigest(d)}`);
-    }
-    return `<p class="eyebrow">${esc(fmtDate(new Date().toISOString().slice(0, 10)))}</p>
-      <h1 class="page-title">${esc(greeting())}</h1>${chips}${blocks.join('<div style="height:18px"></div>')}`;
-  };
-
-  V.archive = async (q = '') => {
-    const ql = q.trim().toLowerCase();
-    let entries = S.index;
-    if (ql) {
-      // search titles first, then load and search full digest text
-      const hits = [];
-      for (const e of entries) {
-        const hay = [e.title?.en, e.title?.ar, e.date].join(' ').toLowerCase();
-        if (hay.includes(ql)) { hits.push(e); continue; }
-        try { const d = await digest(e); if (JSON.stringify(d).toLowerCase().includes(ql)) hits.push(e); } catch { /* skip */ }
-      }
-      entries = hits;
-    }
-    const rows = entries.map((e) => {
-      const task = taskById(e.taskId);
-      const dt = new Date(e.date + 'T12:00:00');
-      return `<a class="row" href="#/digest/${encodeURIComponent(e.id)}">
-        <div class="row-date"><b>${dt.getDate()}</b><span>${esc(dt.toLocaleDateString(locale(), { month: 'short' }))}</span></div>
-        <div class="row-body"><strong>${esc(L(e.title))}</strong>
-          <small>${esc(task ? (task.icon || '') + ' ' + L(task.name) : '')}${e.itemCount ? ` · ${e.itemCount} ${t('items')}` : ''}${e.starCount ? ` · ⭐ ${e.starCount}` : ''}</small></div>
-        <span class="row-chev">${icon('chev')}</span></a>`;
-    }).join('');
-    return `<h1 class="page-title">${t('archive')}</h1>
-      <input class="search" id="search" type="search" placeholder="${t('searchArchive')}" value="${esc(q)}" autocomplete="off" />
-      ${entries.length ? `<div class="card" style="overflow:hidden">${rows}</div>` : `<div class="card empty">${t(ql ? 'noResults' : 'noDigests')}</div>`}`;
-  };
-
-  V.digest = async (id) => {
-    const e = S.index.find((x) => x.id === id);
-    if (!e) return `<div class="card empty">${t('noResults')}</div>`;
-    const d = await digest(e);
-    const task = taskById(e.taskId);
-    return `<a class="back-link flip" href="#/archive">${icon('back')}${t('back')}</a>
-      <p class="eyebrow">${esc(task ? (task.icon || '') + ' ' + L(task.name) : '')} · ${esc(fmtDate(d.date))}</p>
-      <h1 class="page-title">${esc(L(d.title))}</h1>${renderDigest(d)}`;
-  };
-
-  V.saved = async () => {
-    if (!S.saved.length) return `<h1 class="page-title">${t('saved')}</h1><div class="card empty"><div class="big">🔖</div>${t('noSaved')}</div>`;
-    const list = S.saved.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-    return `<h1 class="page-title">${t('saved')}</h1><section class="card source-card">${list.map((s) =>
-      `<div class="item ${s.item.star ? 'star' : ''}"><div class="item-body">
-        <div class="eyebrow">${esc(s.source)} · ${esc(fmtDate(s.date, { day: 'numeric', month: 'short', year: 'numeric' }))}</div>
-        <h3>${esc(L(s.item.headline))}</h3><p>${esc(L(s.item.summary))}</p></div>
-        <div class="item-actions">
-          <button class="mini-btn" data-save="${esc(s.key)}" aria-pressed="true" aria-label="${t('unsave')}">${icon('saved', true)}</button>
-          ${s.item.url ? `<a class="mini-btn" href="${esc(s.item.url)}" target="_blank" rel="noopener">${icon('ext')}</a>` : ''}
-        </div></div>`).join('')}</section>`;
-  };
-
-  const TYPES = ['website', 'telegram', 'x', 'other'];
-  V.tasks = async () => {
-    const cards = S.tasks.map((task) => {
-      const groups = TYPES.map((ty) => {
-        const srcs = (task.sources || []).filter((s) => (s.type || 'other') === ty);
-        if (!srcs.length) return '';
-        return `<div class="src-group"><h4>${t(ty)} · ${srcs.length}</h4>${srcs.map((s) =>
-          `<div class="src-row"><div class="source-logo ${ty === 'telegram' ? 'tg' : ty === 'x' ? 'x' : ''}">${esc(initials(s.name))}</div>
-           <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>
-           <button class="x-btn" data-del-src="${esc(task.id)}|${esc(s.id)}" aria-label="${t('delete')}">${icon('x')}</button></div>`).join('')}</div>`;
-      }).join('');
-      return `<article class="card task-card">
-        <div class="task-top"><div class="task-icon">${esc(task.icon || '🤖')}</div>
-          <div style="flex:1;min-width:0"><h3>${esc(L(task.name))}</h3><p>${esc(L(task.description))}</p></div>
-          <label class="switch" title="${t(task.enabled ? 'enabled' : 'paused')}"><input type="checkbox" data-toggle="${esc(task.id)}" ${task.enabled ? 'checked' : ''}/><span></span></label>
-        </div>
-        <div class="task-meta"><span class="pill ${task.enabled ? 'ok' : 'off'}">${t(task.enabled ? 'enabled' : 'paused')}</span>
-          ${task.schedule ? `<span class="pill neutral">🕒 ${esc(L(task.schedule))}</span>` : ''}
-          <span class="pill neutral">${(task.sources || []).length} ${t('sources')}</span></div>
-        ${groups}
-        <div class="task-actions">
-          <button class="btn btn-primary btn-sm" data-add-src="${esc(task.id)}">${icon('plus')}${t('addSource')}</button>
-          <button class="btn btn-ghost btn-sm" data-edit-task="${esc(task.id)}">${icon('edit')}${t('editTask')}</button>
-        </div></article>`;
-    }).join('');
-    return `<h1 class="page-title">${t('tasks')}</h1>${cards}
-      <button class="btn btn-ghost" style="width:100%" id="newTask">${icon('plus')}${t('newTask')}</button>`;
-  };
-
-  V.settings = async () => {
-    const seg = (name, opts, cur) => `<div class="seg">${opts.map(([v, label]) => `<button data-${name}="${v}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
-    const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    return `<h1 class="page-title">${t('settings')}</h1>
-      <div class="card">
-        <div class="setting"><div class="setting-label"><strong>${t('language')}</strong></div>${seg('lang', [['en', 'English'], ['ar', 'العربية']], prefs.lang)}</div>
-        <div class="setting"><div class="setting-label"><strong>${t('theme')}</strong></div>${seg('theme', [['light', t('light')], ['dark', t('dark')], ['system', t('system')]], prefs.theme)}</div>
-        <div class="setting"><div class="setting-label"><strong>${t('install')}</strong><small>${standalone ? t('installDone') : ios ? t('installIos') : t('installHelp')}</small></div>
-          ${standalone || ios ? '' : `<button class="btn btn-primary btn-sm" id="installBtn">${icon('download')}${t('install')}</button>`}</div>
-        <div class="setting"><div class="setting-label"><strong>${t('pin')}</strong><small>${t('pinHelp')}</small></div>
-          <input id="pinInput" type="password" inputmode="numeric" autocomplete="off" value="${esc(prefs.pin)}" style="width:110px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px;font:inherit" /></div>
-        <div class="setting"><div class="setting-label"><strong>${t('cloud')}</strong><small>${S.cloud ? t('cloudOn') : t('cloudOff')}</small></div>
-          <button class="btn btn-ghost btn-sm" id="refreshBtn">${icon('refresh')}${t('refresh')}</button></div>
-      </div>
-      <h2 class="section-title">${t('about')}</h2>
-      <div class="card" style="padding:16px"><p style="margin:0;color:var(--ink-2)">${t('aboutText')}</p>
-        <p class="muted" style="margin:10px 0 0;font-size:13px">v1.0 · ${S.index.length} digests · ${S.tasks.length} ${t('tasks').toLowerCase()}</p></div>`;
-  };
-
-  // ---------- dialogs ----------
-  function openDialog(html, onSubmit) {
-    const dlg = $('#dialog');
-    dlg.innerHTML = `<form class="dlg" method="dialog">${html}</form>`;
-    const form = dlg.querySelector('form');
-    form.addEventListener('submit', (ev) => {
-      const btn = ev.submitter;
-      if (btn && btn.value === 'cancel') return;
-      ev.preventDefault();
-      if (btn && btn.value === 'delete') { if (confirm(t('confirmDelete'))) { onSubmit(null, 'delete'); dlg.close(); } return; }
-      onSubmit(Object.fromEntries(new FormData(form)), 'save'); dlg.close();
-    });
-    dlg.showModal();
-    setTimeout(() => form.querySelector('input,textarea')?.focus(), 50);
-  }
-
-  function normaliseUrl(type, raw) {
-    let v = String(raw || '').trim();
-    if (!v) return '';
-    if (type === 'telegram' && /^@?[\w]{4,}$/.test(v)) return 'https://t.me/' + v.replace(/^@/, '');
-    if (type === 'x' && /^@?[\w]{1,15}$/.test(v)) return 'https://x.com/' + v.replace(/^@/, '');
-    if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
-    return v;
-  }
-
-  function addSourceDialog(taskId) {
-    openDialog(`<h2>${t('addSource')}</h2>
-      <label class="field"><span>${t('sourceType')}</span><select name="type">${TYPES.map((ty) => `<option value="${ty}">${t(ty)}</option>`).join('')}</select></label>
-      <label class="field"><span>${t('sourceName')}</span><input name="name" required maxlength="80" /></label>
-      <label class="field"><span>${t('sourceUrl')}</span><input name="url" required maxlength="300" dir="ltr" /></label>
-      <div class="dlg-actions"><button class="btn btn-ghost" value="cancel" formnovalidate>${t('cancel')}</button><button class="btn btn-primary" value="save">${t('add')}</button></div>`,
-    (data) => {
-      const task = taskById(taskId); if (!task) return;
-      task.sources = task.sources || [];
-      task.sources.push({ id: uid(), type: data.type, name: data.name.trim(), url: normaliseUrl(data.type, data.url) });
-      persist(); route();
-    });
-  }
-
-  function taskDialog(taskId) {
-    const task = taskId ? taskById(taskId) : null;
-    openDialog(`<h2>${t(task ? 'editTask' : 'newTask')}</h2>
-      <label class="field"><span>${t('icon')}</span><input name="icon" maxlength="4" value="${esc(task?.icon || '🤖')}" style="width:80px" /></label>
-      <label class="field"><span>${t('taskNameEn')}</span><input name="nameEn" required maxlength="80" dir="ltr" value="${esc(task?.name?.en || '')}" /></label>
-      <label class="field"><span>${t('taskNameAr')}</span><input name="nameAr" maxlength="80" dir="rtl" value="${esc(task?.name?.ar || '')}" /></label>
-      <label class="field"><span>${t('taskDesc')}</span><textarea name="desc" maxlength="600">${esc(L(task?.description) || '')}</textarea></label>
-      <label class="field"><span>${t('taskSchedule')}</span><input name="schedule" maxlength="80" value="${esc(L(task?.schedule) || '')}" /></label>
-      ${task ? '' : `<p class="note">${t('newTaskNote')}</p>`}
-      <div class="dlg-actions">${task ? `<button class="btn btn-danger" value="delete" formnovalidate style="margin-inline-end:auto">${t('delete')}</button>` : ''}
-        <button class="btn btn-ghost" value="cancel" formnovalidate>${t('cancel')}</button><button class="btn btn-primary" value="save">${t('saveChanges')}</button></div>`,
-    (data, action) => {
-      if (action === 'delete') { S.tasks = S.tasks.filter((x) => x.id !== taskId); persist(); route(); return; }
-      const both = (v) => ({ en: v, ar: v });
-      if (task) {
-        task.icon = data.icon || task.icon;
-        task.name = { en: data.nameEn.trim(), ar: data.nameAr.trim() || data.nameEn.trim() };
-        task.description = { ...(task.description || {}), [prefs.lang]: data.desc.trim() };
-        task.schedule = { ...(task.schedule || {}), [prefs.lang]: data.schedule.trim() };
-      } else {
-        S.tasks.push({ id: 'task-' + uid(), icon: data.icon || '🤖', name: { en: data.nameEn.trim(), ar: data.nameAr.trim() || data.nameEn.trim() },
-          description: both(data.desc.trim()), schedule: both(data.schedule.trim()), enabled: true, sources: [] });
-      }
-      persist(); route();
-    });
-  }
-
-  // ---------- events ----------
-  document.addEventListener('click', (ev) => {
-    const el = ev.target.closest('button, [data-filter]');
-    if (!el) return;
-    if (el.id === 'langBtn') { prefs.lang = prefs.lang === 'ar' ? 'en' : 'ar'; store.set('lang', prefs.lang); applyLang(); route(); return; }
-    if (el.id === 'themeBtn') { prefs.theme = { system: 'light', light: 'dark', dark: 'system' }[prefs.theme]; store.set('theme', prefs.theme); applyTheme(); if (curView === 'settings') route(); return; }
-    if (el.dataset.filter) { S.filter = el.dataset.filter; route(); return; }
-    if (el.dataset.lang) { prefs.lang = el.dataset.lang; store.set('lang', prefs.lang); applyLang(); route(); return; }
-    if (el.dataset.theme) { prefs.theme = el.dataset.theme; store.set('theme', prefs.theme); applyTheme(); route(); return; }
-    if (el.dataset.save) {
-      const key = el.dataset.save;
-      if (isSaved(key)) { S.saved = S.saved.filter((x) => x.key !== key); toast(t('removedToast')); }
-      else if (el.dataset.payload) { S.saved.push(JSON.parse(el.dataset.payload)); toast(t('savedToast')); }
-      store.set('saved', S.saved);
-      if (S.cloud) persistQuiet();
-      if (curView === 'saved') route(); else { const on = isSaved(key); el.setAttribute('aria-pressed', on); el.innerHTML = icon('saved', on); }
-      return;
-    }
-    if (el.dataset.addSrc) { addSourceDialog(el.dataset.addSrc); return; }
-    if (el.dataset.editTask) { taskDialog(el.dataset.editTask); return; }
-    if (el.dataset.delSrc) {
-      const [tid, sid] = el.dataset.delSrc.split('|'); const task = taskById(tid);
-      if (task && confirm(t('confirmDelete'))) { task.sources = task.sources.filter((s) => s.id !== sid); persist(); route(); }
-      return;
-    }
-    if (el.id === 'newTask') { taskDialog(null); return; }
-    if (el.id === 'refreshBtn') { S.digests = {}; boot(); return; }
-    if (el.id === 'installBtn') {
-      if (S.installEvt) { S.installEvt.prompt(); S.installEvt.userChoice.finally(() => { S.installEvt = null; route(); }); }
-      else alert(t('installManual'));
-    }
-  });
-  document.addEventListener('change', (ev) => {
-    const el = ev.target;
-    if (el.dataset.toggle) { const task = taskById(el.dataset.toggle); if (task) { task.enabled = el.checked; persist(); route(); } }
-    if (el.id === 'pinInput') { prefs.pin = el.value.trim(); store.set('pin', prefs.pin); toast(t('pinSet')); }
-  });
-  let searchT;
-  document.addEventListener('input', (ev) => {
-    if (ev.target.id !== 'search') return;
-    clearTimeout(searchT);
-    const q = ev.target.value;
-    searchT = setTimeout(async () => {
-      const pos = ev.target.selectionStart;
-      $('#view').innerHTML = await V.archive(q);
-      const s = $('#search'); s.focus(); s.setSelectionRange(pos, pos);
-    }, 220);
-  });
-  let quietT;
-  function persistQuiet() {
-    clearTimeout(quietT);
-    quietT = setTimeout(() => fetch('/api/state', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-app-pin': prefs.pin || '' },
-      body: JSON.stringify({ tasks: S.tasks, saved: S.saved })
-    }).catch(() => {}), 600);
-  }
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); S.installEvt = e; });
-  window.addEventListener('appinstalled', () => toast(t('installDone')));
-
-  // ---------- router ----------
-  let curView = 'today';
-  async function route() {
-    const [, name = 'today', arg] = (location.hash || '#/today').split('/');
-    curView = V[name] ? name : 'today';
-    renderNav(curView === 'digest' ? 'archive' : curView);
-    const view = $('#view');
-    try {
-      const html = await V[curView](arg ? decodeURIComponent(arg) : undefined);
-      view.innerHTML = `<div class="fade-in">${html}</div>`;
-    } catch (err) {
-      view.innerHTML = `<div class="card empty">⚠️ ${esc(err.message)}</div>`;
-    }
-  }
-  window.addEventListener('hashchange', () => { route(); window.scrollTo(0, 0); });
-
-  async function boot() {
-    applyTheme(); applyLang();
-    $('#view').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
-    await loadAll();
-    route();
-  }
-  boot();
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
-  }
-})();
+/* ---------- boot ---------- */
+async function boot(){
+  const [cfg,idx]=await Promise.all([getJSON("/data/config.json").catch(()=>({tasks:[]})),getJSON("/data/digests/index.json").catch(()=>({digests:[]}))]);
+  INDEX=(idx.digests||[]).slice().sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id));
+  if(!S.tasks.length)S.tasks=(cfg.tasks||[]).map(fixTask);
+  await Promise.all([api("/api/claude").then(j=>{aiOn=!!j.configured}).catch(()=>{aiOn=false}),api("/api/telegram?action=status").then(j=>{tgOn=!!j.configured;tgChat=!!j.chatSet}).catch(()=>{tgOn=false})]);
+  try{const j=await api("/api/state");syncOn=true;const R=j.state;if(R){if(R.topics&&(R.edited||0)>(S.edited||0)){const run=S.run&&(!R.run||(S.run.at||0)>(R.run.at||0))?S.run:R.run;S=load({...R,run})}else{if(Array.isArray(R.tasks)&&R.tasks.length&&!R.topics)S.tasks=R.tasks.map(fixTask);if(Array.isArray(R.saved)){const m=new Map();[...R.saved,...S.saved].forEach(x=>{const k=x.key||x.pmid;if(k&&!m.has(k))m.set(k,x)});S.saved=[...m.values()]}}}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}ready=true;if(!R||!R.topics||(S.edited||0)>(R.edited||0))flush()}catch(e){syncOn=false;ready=true}
+  renderAll();renderChat();
+}
+renderAll();renderChat();boot();
+}

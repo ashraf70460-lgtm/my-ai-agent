@@ -20,25 +20,17 @@
           "value": "no-cache"
         }
       ]
-    },
-    {
-      "source": "/pulmonologist/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        },
-        {
-          "key": "Service-Worker-Allowed",
-          "value": "/pulmonologist/"
-        }
-      ]
     }
   ],
   "redirects": [
     {
       "source": "/pulmonologist",
-      "destination": "/pulmonologist/",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/pulmonologist/:path*",
+      "destination": "/",
       "permanent": false
     }
   ],
@@ -48,6 +40,15 @@
     },
     "api/claude.js": {
       "maxDuration": 60
+    },
+    "api/telegram.js": {
+      "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/telegram?action=digest",
+      "schedule": "50 4 * * *"
+    }
+  ]
 }

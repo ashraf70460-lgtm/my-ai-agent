@@ -1,53 +1,186 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>My Agent — وكيلي</title>
-  <meta name="description" content="Dr. Ashraf's personal AI agent — daily respiratory updates in English and Arabic." />
-  <meta name="theme-color" content="#0f766e" />
-  <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/app.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pulmonologist</title>
+<meta name="description" content="Dr. Ashraf's AI agent for respiratory medicine: daily reports from websites, guidelines, papers and Telegram, plus conferences, videos, people and books.">
+<meta name="theme-color" content="#1a47c9">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pulmonologist">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar" aria-label="Main">
-      <a class="brand" href="#/today">
-        <img src="/icons/icon.svg" alt="" width="36" height="36" />
-        <span><strong data-i18n="appName">My Agent</strong><small data-i18n="appTag">Personal AI agent</small></span>
-      </a>
-      <nav class="nav" id="nav"></nav>
-      <div class="sidebar-foot" id="syncBadge"></div>
-    </aside>
-
-    <div class="main">
-      <header class="topbar">
-        <a class="brand brand-mobile" href="#/today">
-          <img src="/icons/icon.svg" alt="" width="30" height="30" />
-          <strong data-i18n="appName">My Agent</strong>
-        </a>
-        <div class="topbar-actions">
-          <button class="chip-btn" id="langBtn" aria-label="Language">ع</button>
-          <button class="icon-btn" id="themeBtn" aria-label="Theme"></button>
-        </div>
-      </header>
-      <main id="view" tabindex="-1"></main>
-    </div>
-
-    <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+<div class="bar">
+  <div class="wrap top">
+    <a class="logo" href="#home" aria-label="Pulmonologist"><img src="/icons/icon.svg" alt="" width="34" height="34"></a>
+    <div class="brand" id="brand">Pulmonologist</div>
+    <div class="sp"></div>
+    <button class="ib" id="langBtn" type="button">العربية</button>
+    <button class="ib" id="setBtn" type="button" data-t="settings">Settings</button>
   </div>
+  <nav class="wrap tabs" id="tabs" aria-label="Sections"></nav>
+</div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <dialog id="dialog"></dialog>
+<section class="hero">
+  <div class="wrap heroin">
+    <div>
+      <h1 id="heroTitle">Good evening, Dr. Ashraf.</h1>
+      <p id="heroSub">Here is what's new in respiratory medicine.</p>
+      <div class="row" style="gap:10px">
+        <button class="run" id="runBtn" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg><span data-t="run">Check PubMed now</span></button>
+        <a class="ghost" href="#reports" data-t="allReports">All reports</a>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+      <div class="stats">
+        <div class="stat"><b id="sItems">0</b><span data-t="reportItems">in today's report</span></div>
+        <div class="stat"><b id="sStars">0</b><span data-t="practiceN">practice-changing</span></div>
+        <div class="stat"><b id="sPapers">0</b><span data-t="newPapers">new papers</span></div>
+        <div class="stat"><b id="sNext">–</b><span id="sNextL" data-t="nextEvent">days to next event</span></div>
+      </div>
+    </div>
+    <div class="loop" aria-hidden="true"><svg id="loopSvg"></svg><div class="loopcap" data-t="loopCap">Flow–volume loop · the agent breathes in the literature</div></div>
+  </div>
+</section>
 
-  <script src="/i18n.js"></script>
-  <script src="/app.js"></script>
+<main class="wrap">
+  <div class="install" id="installBar"><span style="flex:1" id="installTxt">Install Pulmonologist on your phone or computer for one-tap access.</span><button class="btn pri" type="button" id="installBtn" data-t="install">Install</button><button class="btn" type="button" id="installX" aria-label="Dismiss">✕</button></div>
+
+  <section class="view" id="v-home">
+    <div class="grid2">
+      <div class="card report" id="homeReport"></div>
+      <div>
+        <div class="card"><h3 data-t="briefing">Live PubMed briefing</h3><div class="brief" id="brief"></div></div>
+        <div class="card"><div class="row"><h3 data-t="upcoming" style="margin:0">Coming up</h3><span class="sp"></span><a class="btn" href="#events" data-t="seeAll">See all</a></div><div class="list" id="homeEvents" style="margin-top:12px"></div></div>
+        <div class="card"><div class="row"><h3 data-t="topPapers" style="margin:0">Top new papers</h3><span class="sp"></span><a class="btn" href="#papers" data-t="seeAll">See all</a></div><div class="list" id="homePapers" style="margin-top:12px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-reports">
+    <h2 data-t="reports">Agent reports</h2>
+    <p class="lede" data-t="reportsLede">Every daily report from your agent, divided into websites, guidelines, papers and Telegram. Search across all of them.</p>
+    <div class="tools"><input type="search" id="rq" placeholder="Search reports" aria-label="Search reports"></div>
+    <div class="list" id="reportList"></div>
+  </section>
+
+  <section class="view" id="v-report"><a class="btn" href="#reports" data-t="back">Back</a><div class="card report" id="reportOne" style="margin-top:14px"></div></section>
+
+  <section class="view" id="v-papers">
+    <h2 data-t="papers">Papers</h2>
+    <p class="lede" data-t="papersLede">New on PubMed for your topics and watches, ranked by journal and study type.</p>
+    <div class="tools"><input type="search" id="pq" placeholder="Search titles, journals" aria-label="Search papers"><button class="chip" id="topOnlyBtn" aria-pressed="false" type="button" data-t="topOnly">Top journals only</button></div>
+    <div class="chips" id="pTopics" style="margin-bottom:14px"></div>
+    <div class="list" id="paperList"></div>
+  </section>
+
+  <section class="view" id="v-guidelines">
+    <h2 data-t="guidelines">Guidelines</h2>
+    <p class="lede" data-t="guidesLede">Major reports and society guidelines, plus new guideline and consensus papers found on PubMed.</p>
+    <div class="list" id="guideList"></div>
+    <div class="sec"><h3 data-t="watch">In development: watch list</h3><div class="list" id="watchList"></div></div>
+    <div class="sec"><h3 data-t="fromPubmed">New guideline papers on PubMed</h3><div class="list" id="pmGuides"></div></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="guidelines"><input name="title" required placeholder="Title"><input name="org" placeholder="Society"><input name="date" type="date" aria-label="Date"><input name="url" type="url" placeholder="https://"><input name="note" placeholder="Note"><button class="btn pri" data-t="add">Add</button></form></div>
+  </section>
+
+  <section class="view" id="v-events">
+    <h2 data-t="events">Conferences</h2>
+    <p class="lede" data-t="eventsLede">Respiratory meetings and deadlines with live countdowns. Confirm dates on the official site before booking.</p>
+    <div class="list" id="eventList"></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="events"><input name="title" required placeholder="Meeting"><input name="start" type="date" required aria-label="Start"><input name="end" type="date" aria-label="End"><input name="place" placeholder="City"><input name="url" type="url" placeholder="https://"><button class="btn pri" data-t="add">Add</button></form></div>
+    <div class="sec"><button class="btn pri" type="button" data-suggest="events" data-t="suggest">Ask the agent for more</button><div class="list" id="sugg-events" style="margin-top:12px"></div></div>
+  </section>
+
+  <section class="view" id="v-videos">
+    <h2 data-t="videos">Videos</h2>
+    <p class="lede" data-t="videosLede">Guideline walk-throughs, congress replays, and the newest YouTube uploads for each of your topics.</p>
+    <h3 data-t="ytNew">Newest on YouTube by topic</h3>
+    <div class="chips" id="ytChips" style="margin-bottom:22px"></div>
+    <div class="list" id="videoList"></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="videos"><input name="title" required placeholder="Title"><input name="src" placeholder="Channel"><input name="url" type="url" required placeholder="https://"><input name="tag" placeholder="Topic"><button class="btn pri" data-t="add">Add</button></form></div>
+    <div class="sec"><button class="btn pri" type="button" data-suggest="videos" data-t="suggest">Ask the agent for more</button><div class="list" id="sugg-videos" style="margin-top:12px"></div></div>
+  </section>
+
+  <section class="view" id="v-people">
+    <h2 data-t="people">People to follow</h2>
+    <p class="lede" data-t="peopleLede">Leading physicians behind the guidelines. Tap “Latest papers” to pull their newest work from PubMed.</p>
+    <div class="list" id="peopleList"></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="people"><input name="name" required placeholder="Name"><input name="focus" placeholder="Focus"><input name="q" placeholder="PubMed author, e.g. Smith J"><input name="url" type="url" placeholder="https://"><button class="btn pri" data-t="add">Add</button></form></div>
+    <div class="sec"><button class="btn pri" type="button" data-suggest="people" data-t="suggest">Ask the agent for more</button><div class="list" id="sugg-people" style="margin-top:12px"></div></div>
+  </section>
+
+  <section class="view" id="v-books">
+    <h2 data-t="books">Books</h2>
+    <p class="lede" data-t="booksLede">Core references for a respiratory consultant. Check the publisher for a newer edition before buying.</p>
+    <div class="list" id="bookList"></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="books"><input name="title" required placeholder="Title"><input name="ed" placeholder="Edition / year"><input name="url" type="url" placeholder="https://"><input name="note" placeholder="Note"><button class="btn pri" data-t="add">Add</button></form></div>
+    <div class="sec"><button class="btn pri" type="button" data-suggest="books" data-t="suggest">Ask the agent for more</button><div class="list" id="sugg-books" style="margin-top:12px"></div></div>
+  </section>
+
+  <section class="view" id="v-ask">
+    <h2 data-t="ask">Ask the agent</h2>
+    <p class="lede" data-t="askLede">Ask anything in English or Arabic. The agent searches PubMed live and cites PMIDs and DOIs.</p>
+    <div class="chips" id="quickAsk" style="margin-bottom:14px"></div>
+    <div class="card"><div class="chat" id="chat"></div>
+      <form class="ask" id="askForm"><textarea id="askIn" placeholder="e.g. Latest RCTs in bronchiectasis" aria-label="Question"></textarea><button class="btn pri" data-t="send">Send</button></form></div>
+  </section>
+
+  <section class="view" id="v-agent">
+    <h2 data-t="agent">Agent</h2>
+    <p class="lede" data-t="agentLede">What your agent does. The daily report runs every morning and is divided into four sections. Live watches run whenever you tap “Check PubMed now”.</p>
+    <div class="list" id="agentTasks"></div>
+    <div class="sec"><h3 data-t="liveWatches">Live PubMed watches</h3><div class="list" id="taskList"></div></div>
+    <div class="sec card"><h3 data-t="newWatch">New watch</h3>
+      <form class="add" id="taskForm"><input name="name" required placeholder="Name, e.g. Bronchiectasis RCTs" aria-label="Watch name"><input name="term" required placeholder='PubMed search, e.g. bronchiectasis AND "Randomized Controlled Trial"[pt]' aria-label="PubMed search"><select name="days" aria-label="Look back"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="90">90 days</option></select><button class="btn pri" data-t="add">Add</button></form>
+      <p class="small" data-t="taskHelp">Tip: use PubMed syntax. Examples: sarcoidosis[ti] · "Practice Guideline"[pt] AND asthma · Saudi Arabia[ad] AND respiratory</p></div>
+    <div class="sec card"><h3 data-t="newTask">New scheduled task</h3>
+      <form class="add" id="agentForm"><input name="name" required placeholder="Name, e.g. Weekly ILD round-up" aria-label="Task name"><input name="desc" required placeholder="What should the agent do?" aria-label="Task description"><input name="schedule" placeholder="When, e.g. Every Friday 7 AM" aria-label="Schedule"><button class="btn pri" data-t="add">Add</button></form>
+      <p class="small" data-t="newTaskNote">New scheduled tasks appear here right away. Ask Claude “activate my new task” to give it a schedule.</p></div>
+  </section>
+
+  <section class="view" id="v-saved">
+    <h2 data-t="saved">Saved</h2>
+    <p class="lede" data-t="savedLede">Report items and papers you bookmarked, on all your devices.</p>
+    <div class="list" id="savedList"></div>
+  </section>
+
+  <section class="view" id="v-sources">
+    <h2 data-t="sources">Reading links</h2>
+    <p class="lede" data-t="sourcesLede">Societies, journals and news sites to open yourself. The websites your agent checks every morning are in Agent.</p>
+    <div id="srcGroups"></div>
+    <div class="sec card"><h3 data-t="addOwn">Add your own</h3><form class="add" data-kind="sources"><input name="name" required placeholder="Name"><select name="kind" aria-label="Type"><option value="society">Society</option><option value="journal">Journal</option><option value="news">News</option></select><input name="url" type="url" required placeholder="https://"><button class="btn pri" data-t="add">Add</button></form></div>
+  </section>
+</main>
+
+<dialog id="dlg"><form class="dlg" method="dialog" id="setForm">
+  <h3 style="margin:0" data-t="settings">Settings</h3>
+  <label><span data-t="appName">App name</span><input id="fName" maxlength="40"></label>
+  <div class="row" style="gap:16px">
+    <label style="flex:1"><span data-t="theme">Theme</span><select id="fTheme"><option value="system">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    <label style="flex:1"><span data-t="lookback">Look back (days)</span><select id="fDays"><option value="7">7</option><option value="14">14</option><option value="30">30</option><option value="60">60</option></select></label>
+  </div>
+  <label><span data-t="pin">App PIN</span><input id="fPin" type="password" inputmode="numeric" autocomplete="off"></label>
+  <div class="statusbox">
+    <div class="row"><span class="dot" id="aiDot"></span><span class="small" id="aiMsg"></span></div>
+    <div class="row"><span class="dot" id="syncDot"></span><span class="small" id="syncMsg"></span></div>
+    <div class="row"><span class="dot" id="tgDot"></span><span class="small" id="tgMsg"></span><span class="sp"></span><button class="btn" type="button" id="tgSetup" data-t="tgConnect">Connect bot</button></div>
+  </div>
+  <details><summary data-t="backup">Backup and restore</summary>
+    <div class="row" style="margin-top:8px"><button class="btn" type="button" id="copyBtn" data-t="copy">Copy backup</button><span class="small" id="copyMsg"></span></div>
+    <textarea id="impTxt" rows="3" placeholder="Paste a backup here" style="width:100%;margin-top:8px"></textarea>
+    <button class="btn" type="button" id="impBtn" data-t="restore">Restore</button></details>
+  <div class="row"><span class="small">v2.0</span><span class="sp"></span><button class="btn pri" value="cancel" data-t="close">Close</button></div>
+</form></dialog>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="/data.js"></script>
+<script src="/app.js"></script>
 </body>
 </html>
