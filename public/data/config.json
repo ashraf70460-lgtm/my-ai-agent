@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "owner": "Dr. Ashraf Ahmed",
+  "tasks": [
+    {
+      "id": "daily-digest",
+      "icon": "🫁",
+      "name": { "en": "Respiratory daily digest", "ar": "الملخص اليومي لطب الجهاز التنفسي" },
+      "description": {
+        "en": "New guidelines, statements and news from the major respiratory societies, plus my Telegram channels.",
+        "ar": "أحدث الإرشادات والبيانات والأخبار من الجمعيات الكبرى لطب الجهاز التنفسي، مع قنوات تيليجرام الخاصة بي."
+      },
+      "schedule": { "en": "Every day · 6:33 AM (Riyadh)", "ar": "يوميًا · 6:33 صباحًا (الرياض)" },
+      "enabled": true,
+      "sources": [
+        { "id": "ats", "type": "website", "name": "ATS — American Thoracic Society", "url": "https://site.thoracic.org/press-releases" },
+        { "id": "bts", "type": "website", "name": "BTS — British Thoracic Society", "url": "https://www.brit-thoracic.org.uk" },
+        { "id": "ers", "type": "website", "name": "ERS — European Respiratory Society", "url": "https://www.ersnet.org" },
+        { "id": "gina", "type": "website", "name": "GINA — Global Initiative for Asthma", "url": "https://ginasthma.org/category/news/" },
+        { "id": "gold", "type": "website", "name": "GOLD — COPD", "url": "https://goldcopd.org" },
+        { "id": "tg-hamdi", "type": "telegram", "name": "Pulmonary Insights | Dr Hamdi Al Turkey", "url": "https://t.me/DrHamdiTurkey" },
+        { "id": "tg-bookjuice", "type": "telegram", "name": "عصير الكتب", "url": "https://t.me/BoOkJuiCe" },
+        { "id": "tg-freebooks", "type": "telegram", "name": "حُبًّا للقراءة", "url": "https://t.me/freebooksf" }
+      ]
+    }
+  ]
+}

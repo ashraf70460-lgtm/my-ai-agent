@@ -1,0 +1,129 @@
+{
+  "id": "2026-11-25-daily-digest",
+  "date": "2026-11-25",
+  "taskId": "daily-digest",
+  "generatedAt": "2026-11-25T13:45:00Z",
+  "title": { "en": "GOLD 2027 is out: LAMA now first-line for group A", "ar": "صدور تقرير GOLD 2027: موسّع LAMA أصبح الخيار الأول للمجموعة A" },
+  "topPick": {
+    "en": "GOLD 2027 — review the group A change (start a LAMA) and the six new pre-COPD categories.",
+    "ar": "تقرير GOLD 2027 — راجع تغيير المجموعة A (البدء بـ LAMA) والفئات الست الجديدة لما قبل COPD."
+  },
+  "sections": [
+    {
+      "sourceId": "gold",
+      "source": "GOLD",
+      "items": [
+        {
+          "star": true,
+          "headline": { "en": "GOLD 2027 report released", "ar": "صدور تقرير GOLD 2027" },
+          "summary": {
+            "en": "Only drug change: initial therapy for group A is now a LAMA. Adds six pre-COPD groups, redefines early/mild/young COPD, and expands CT, rehabilitation and cardiovascular guidance.",
+            "ar": "التغيير الدوائي الوحيد: العلاج الأولي للمجموعة A أصبح LAMA. يضيف ست فئات لما قبل COPD، ويعيد تعريف COPD المبكر والخفيف ولدى الشباب، ويوسّع توصيات الأشعة المقطعية والتأهيل وأمراض القلب."
+          },
+          "url": "https://www.hcplive.com/view/what-s-new-in-2027-gold-report-copd"
+        }
+      ]
+    },
+    {
+      "sourceId": "gina",
+      "source": "GINA",
+      "items": [
+        {
+          "star": false,
+          "headline": { "en": "GINA 2026 executive summary published in AJRCCM", "ar": "نشر الملخص التنفيذي لـ GINA 2026 في مجلة AJRCCM" },
+          "summary": {
+            "en": "Overview of key 2026 changes, including dropping SABA-only treatment in children. Next full update expected May 2027.",
+            "ar": "عرض لأهم تغييرات 2026، ومنها إلغاء العلاج بـ SABA وحده لدى الأطفال. التحديث الكامل القادم متوقع في مايو 2027."
+          },
+          "url": "https://ginasthma.org/category/news/"
+        }
+      ]
+    },
+    {
+      "sourceId": "ats",
+      "source": "ATS",
+      "items": [
+        {
+          "star": true,
+          "headline": { "en": "New ATS clinical practice guideline on pneumonia", "ar": "إرشادات ATS السريرية الجديدة للالتهاب الرئوي" },
+          "summary": {
+            "en": "Covers lung ultrasound, antibiotic choices and corticosteroid use.",
+            "ar": "تشمل الموجات فوق الصوتية للرئة واختيار المضادات الحيوية واستخدام الكورتيكوستيرويدات."
+          },
+          "url": "https://respiratory-therapy.com/tag/ats-american-thoracic-society/"
+        },
+        {
+          "star": false,
+          "headline": { "en": "World Pneumonia Day call to action (FIRS)", "ar": "نداء اليوم العالمي للالتهاب الرئوي (FIRS)" },
+          "summary": {
+            "en": "ATS and FIRS urge wider access to pneumonia vaccines, diagnostics and treatment.",
+            "ar": "تدعو ATS وFIRS إلى توسيع الوصول إلى لقاحات الالتهاب الرئوي ووسائل تشخيصه وعلاجه."
+          },
+          "url": "https://site.thoracic.org/press-releases"
+        }
+      ]
+    },
+    {
+      "sourceId": "ers",
+      "source": "ERS",
+      "items": [
+        {
+          "star": false,
+          "headline": { "en": "ERS 2026: relapse after biologic-induced remission", "ar": "مؤتمر ERS 2026: الانتكاس بعد الهدأة بالعلاج البيولوجي" },
+          "summary": {
+            "en": "About one in five severe-asthma patients in remission on a biologic relapsed within a year — residual T2 inflammation was linked.",
+            "ar": "نحو مريض من كل خمسة مرضى ربو شديد في حالة هدأة على علاج بيولوجي انتكس خلال عام، وارتبط ذلك بالتهاب T2 متبقٍّ."
+          },
+          "url": "https://www.emjreviews.com/respiratory/congress-review/review-of-the-european-respiratory-society-ers-congress-2026-j16126/"
+        }
+      ]
+    },
+    {
+      "sourceId": "bts",
+      "source": "BTS",
+      "items": [
+        {
+          "star": false,
+          "headline": { "en": "New joint TB guideline and pleural guideline", "ar": "إرشادات مشتركة جديدة للسل وإرشادات للجنب" },
+          "summary": {
+            "en": "Latest BTS resources: a new joint tuberculosis guideline and the BTS Pleural Guideline with clinical statement.",
+            "ar": "أحدث موارد BTS: إرشادات مشتركة جديدة للسل، وإرشادات الجنب مع البيان السريري."
+          },
+          "url": "https://www.brit-thoracic.org.uk"
+        }
+      ]
+    },
+    {
+      "sourceId": "tg-hamdi",
+      "source": "Pulmonary Insights | Dr Hamdi Al Turkey",
+      "type": "telegram",
+      "items": [
+        {
+          "star": false,
+          "headline": { "en": "Advanced Case Studies in Pulmonary Medicine, Vol. I (2026)", "ar": "دراسات حالة متقدمة في طب الرئة، المجلد الأول (2026)" },
+          "summary": {
+            "en": "527 pages, 25 monographs and 200 viva questions — first of a planned four-volume clinical-reasoning series.",
+            "ar": "527 صفحة و25 دراسة و200 سؤال شفهي، وهو الأول من سلسلة مخططة من أربعة مجلدات في الاستدلال السريري."
+          },
+          "url": "https://t.me/DrHamdiTurkey"
+        }
+      ]
+    },
+    {
+      "sourceId": "tg-bookjuice",
+      "source": "عصير الكتب / حُبًّا للقراءة",
+      "type": "telegram",
+      "items": [
+        {
+          "star": false,
+          "headline": { "en": "Preview unavailable", "ar": "المعاينة غير متاحة" },
+          "summary": {
+            "en": "These channels don't show posts on their public web page.",
+            "ar": "هذه القنوات لا تعرض منشوراتها على صفحتها العامة."
+          },
+          "url": "https://t.me/BoOkJuiCe"
+        }
+      ]
+    }
+  ]
+}

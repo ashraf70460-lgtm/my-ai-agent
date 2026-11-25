@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>My Agent — وكيلي</title>
+  <meta name="description" content="Dr. Ashraf's personal AI agent — daily respiratory updates in English and Arabic." />
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Main">
+      <a class="brand" href="#/today">
+        <img src="/icons/icon.svg" alt="" width="36" height="36" />
+        <span><strong data-i18n="appName">My Agent</strong><small data-i18n="appTag">Personal AI agent</small></span>
+      </a>
+      <nav class="nav" id="nav"></nav>
+      <div class="sidebar-foot" id="syncBadge"></div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <a class="brand brand-mobile" href="#/today">
+          <img src="/icons/icon.svg" alt="" width="30" height="30" />
+          <strong data-i18n="appName">My Agent</strong>
+        </a>
+        <div class="topbar-actions">
+          <button class="chip-btn" id="langBtn" aria-label="Language">ع</button>
+          <button class="icon-btn" id="themeBtn" aria-label="Theme"></button>
+        </div>
+      </header>
+      <main id="view" tabindex="-1"></main>
+    </div>
+
+    <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog id="dialog"></dialog>
+
+  <script src="/i18n.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
