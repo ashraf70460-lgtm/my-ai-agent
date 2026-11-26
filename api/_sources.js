@@ -27,7 +27,9 @@ export async function epmcSearch(q, { days = 30, from, to, max = 25, preprintsOn
   let query = `(${q}) AND FIRST_PDATE:[${r.from} TO ${r.to}]`;
   if (preprintsOnly) query += ' AND SRC:PPR';
   const url = `https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&resultType=core&pageSize=${Math.min(max, 100)}&sort=${encodeURIComponent('FIRST_PDATE desc')}&query=${encodeURIComponent(query)}`;
-  const j = await getJSON(url, { timeout: 28000 });
+  let j;
+  try { j = await getJSON(url, { timeout: 20000 }); }
+  catch (e) { j = await getJSON(url.replace(/&sort=[^&]+/, ''), { timeout: 20000 }); } // retry once, unsorted (lighter for the server)
   return ((j.resultList && j.resultList.result) || []).map((x) => {
     const types = (x.pubTypeList && x.pubTypeList.pubType) || [];
     const ft = ((x.fullTextUrlList && x.fullTextUrlList.fullTextUrl) || []).find((u) => u.availabilityCode === 'OA' || u.availability === 'Open access');
