@@ -9,10 +9,11 @@ export default async function handler(req, res) {
     const q = String((req.query && req.query.q) || '').trim().slice(0, 200);
     if (!q) return res.status(400).json({ error: 'q-required' });
     const list = await books(q, { max: +(req.query.max || 20), newest: req.query.newest !== '0' });
-    const ranked = list.map((b) => ({ ...b, reputable: PUBLISHERS.test(b.publisher) }))
+    const ranked = list.map((b) => ({ ...b, reputable: PUBLISHERS.test([b.publisher, ...(b.publishers || [])].join(' ')) }))
       .sort((a, b) => (b.reputable - a.reputable) || String(b.date).localeCompare(String(a.date)));
-    return res.status(200).json({ books: ranked, at: new Date().toISOString() });
+    return res.status(200).json({ books: ranked, source: (list[0] && list[0].src) || 'googlebooks', at: new Date().toISOString() });
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(502).json({ error: 'books-failed', detail: String((e && e.message) || e) });
   }
 }

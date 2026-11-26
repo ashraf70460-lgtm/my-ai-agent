@@ -27,7 +27,7 @@ export async function epmcSearch(q, { days = 30, from, to, max = 25, preprintsOn
   let query = `(${q}) AND FIRST_PDATE:[${r.from} TO ${r.to}]`;
   if (preprintsOnly) query += ' AND SRC:PPR';
   const url = `https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&resultType=core&pageSize=${Math.min(max, 100)}&sort=${encodeURIComponent('FIRST_PDATE desc')}&query=${encodeURIComponent(query)}`;
-  const j = await getJSON(url);
+  const j = await getJSON(url, { timeout: 28000 });
   return ((j.resultList && j.resultList.result) || []).map((x) => {
     const types = (x.pubTypeList && x.pubTypeList.pubType) || [];
     const ft = ((x.fullTextUrlList && x.fullTextUrlList.fullTextUrl) || []).find((u) => u.availabilityCode === 'OA' || u.availability === 'Open access');
@@ -115,7 +115,9 @@ export async function books(q, { max = 20, newest = true } = {}) {
   const p = new URLSearchParams({ q, maxResults: String(Math.min(max, 40)), printType: 'books', langRestrict: 'en' });
   if (newest) p.set('orderBy', 'newest');
   if (process.env.GOOGLE_BOOKS_KEY) p.set('key', process.env.GOOGLE_BOOKS_KEY);
-  const j = await getJSON(`https://www.googleapis.com/books/v1/volumes?${p}`);
+  let j;
+  try { j = await getJSON(`https://www.googleapis.com/books/v1/volumes?${p}`); }
+  catch (e) { return openLibrary(q, { max, newest, why: e.message }); }
   return (j.items || []).map((b) => {
     const v = b.volumeInfo || {};
     const isbn = (v.industryIdentifiers || []).reduce((o, i) => ({ ...o, [i.type]: i.identifier }), {});
@@ -124,6 +126,24 @@ export async function books(q, { max = 20, newest = true } = {}) {
       date: v.publishedDate || '', isbn13: isbn.ISBN_13 || '', isbn10: isbn.ISBN_10 || '', pages: v.pageCount || null,
       categories: v.categories || [], description: clean(v.description).slice(0, 700), preview: v.previewLink || '', info: v.infoLink || '',
       thumbnail: (v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail)) || '', src: 'googlebooks'
+    };
+  });
+}
+// Fallback when Google Books is rate-limited: Open Library (Internet Archive) search API.
+export async function openLibrary(q, { max = 20, newest = true } = {}) {
+  const term = q.replace(/intitle:/g, '');
+  const p = new URLSearchParams({ q: term, limit: String(Math.min(max, 40)), fields: 'key,title,subtitle,author_name,publisher,first_publish_year,publish_date,isbn,number_of_pages_median,subject,cover_i,edition_count', lang: 'eng' });
+  if (newest) p.set('sort', 'new');
+  const j = await getJSON(`https://openlibrary.org/search.json?${p}`, { timeout: 20000 });
+  return (j.docs || []).map((d) => {
+    const dates = (d.publish_date || []).map((x) => (/(\d{4})/.exec(x) || [])[1]).filter(Boolean).sort();
+    const isbn13 = (d.isbn || []).find((x) => x.length === 13) || '';
+    return {
+      id: 'ol' + String(d.key).replace(/\W/g, ''), title: clean(d.title + (d.subtitle ? ': ' + d.subtitle : '')), authors: (d.author_name || []).slice(0, 4),
+      publisher: (d.publisher || [])[0] || '', publishers: (d.publisher || []).slice(0, 6), date: dates[dates.length - 1] || String(d.first_publish_year || ''),
+      isbn13, isbn10: (d.isbn || []).find((x) => x.length === 10) || '', pages: d.number_of_pages_median || null, categories: (d.subject || []).slice(0, 3),
+      description: d.edition_count ? `${d.edition_count} edition(s) recorded in Open Library` : '', preview: '', info: 'https://openlibrary.org' + d.key,
+      thumbnail: d.cover_i ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg` : '', src: 'openlibrary'
     };
   });
 }

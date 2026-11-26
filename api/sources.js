@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     probe('ctgov', 'ClinicalTrials.gov API v2', 'database', async () => `${(await ctgovSearch('asthma', { days: 30, max: 1 })).length ? 'results' : 'no results'} for test query`),
     probe('crossref', 'Crossref (DOI verification, retractions)', 'database', async () => { const w = await crossrefWork('10.1056/NEJMoa1214103'); return w.title ? 'DOI lookup works' : 'no title'; }),
     probe('openfda', 'openFDA (label changes, recalls)', 'regulatory', async () => `${(await fdaRecalls({ days: 365, max: 1 })).length} test result`),
-    probe('googlebooks', 'Google Books (editions, ISBN)', 'books', async () => `${(await books('pulmonary function testing', { max: 1 })).length} test result`)
+    probe('googlebooks', 'Google Books → Open Library fallback (editions, ISBN)', 'books', async () => { const r = await books('pulmonary function testing', { max: 1 }); return `${r.length} test result via ${(r[0] && r[0].src) || 'googlebooks'}`; })
   ]);
   list.push({ id: 'claude', name: 'Claude (analysis, synthesis)', kind: 'ai', ok: Boolean(process.env.ANTHROPIC_API_KEY), detail: process.env.ANTHROPIC_API_KEY ? 'API key set' : 'ANTHROPIC_API_KEY not set' });
   list.push({ id: 'websearch', name: 'Web search (via Claude, for society websites)', kind: 'ai', ok: Boolean(process.env.ANTHROPIC_API_KEY) && process.env.WEB_SEARCH !== 'off', detail: process.env.ANTHROPIC_API_KEY ? (process.env.WEB_SEARCH === 'off' ? 'turned off' : 'available when your Anthropic organisation allows web search') : 'needs ANTHROPIC_API_KEY' });

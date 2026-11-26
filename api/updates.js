@@ -25,7 +25,7 @@ export async function quickUpdate({ days = 7, focus = '' } = {}) {
   const big = d > 30 ? 25 : 15;
   const [pm, trials, fda, recalls] = await Promise.all([
     timed(status, 'pubmed', () => runSearches([
-      { term: `${scope} AND ${GUIDE} AND english[la]`, days: Math.max(d, 7), max: big, tag: 'guidelines' },
+      { term: `${f ? scope : RESP.replace(/\[tiab\]/g, '[ti]')} AND ${GUIDE} AND english[la]`, days: Math.max(d, 7), max: big, tag: 'guidelines' },
       { term: `${scope} AND ${HIGH} AND english[la]`, days: d, max: big, tag: 'high' },
       { term: `${f ? scope + ' AND ' : ''}(${RESP_J})`, days: d, max: big, tag: 'top' },
       { term: `${scope} AND (${GEN_J})`, days: d, max: 12, tag: 'top' }

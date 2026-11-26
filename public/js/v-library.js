@@ -117,7 +117,7 @@ PA.view('books', {
         const r = await api('/api/books?q=' + encodeURIComponent(AREAS[bArea][1]) + '&max=30');
         const yr = new Date().getFullYear() - 3;
         const list = r.books.filter((b) => (!onlyRep || b.reputable) && (!last3 || parseInt(b.date, 10) >= yr));
-        el.querySelector('#bSt').textContent = `Google Books · ${list.length} · ${fmtT(Date.parse(r.at))}`;
+        el.querySelector('#bSt').textContent = `${r.source === 'openlibrary' ? 'Open Library (Google Books busy)' : 'Google Books'} · ${list.length} · ${fmtT(Date.parse(r.at))}`;
         box.innerHTML = list.map(bookCard).join('') || empty(t('noResults'));
       } catch (e) { box.innerHTML = empty(errMsg(e)); }
     };
