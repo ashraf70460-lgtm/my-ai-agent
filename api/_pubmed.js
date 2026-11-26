@@ -31,11 +31,16 @@ async function getJSON(url) {
   throw new Error('NCBI rate limit');
 }
 
-export async function search(term, days = 14, max = 10) {
-  const d = Math.min(Math.max(parseInt(days, 10) || 14, 1), 3650);
-  const m = Math.min(Math.max(parseInt(max, 10) || 10, 1), 40);
-  const url = `${EU}esearch.fcgi?db=pubmed&retmode=json&sort=pub_date&retmax=${m}&datetype=edat&reldate=${d}&term=${encodeURIComponent(term)}${TOOL}${KEY()}`;
+export async function search(term, days = 14, max = 10, opts = {}) {
+  const d = Math.min(Math.max(parseInt(days, 10) || 14, 1), 36500);
+  const m = Math.min(Math.max(parseInt(max, 10) || 10, 1), 60);
+  const sort = opts.sort === 'relevance' ? 'relevance' : 'pub_date';
+  let range = `&datetype=${opts.datetype || 'edat'}&reldate=${d}`;
+  if (opts.from) range = `&datetype=${opts.datetype || 'pdat'}&mindate=${opts.from.replace(/-/g, '/')}&maxdate=${(opts.to || new Date().toISOString().slice(0, 10)).replace(/-/g, '/')}`;
+  if (opts.noDate) range = '';
+  const url = `${EU}esearch.fcgi?db=pubmed&retmode=json&sort=${sort}&retmax=${m}${range}&term=${encodeURIComponent(term)}${TOOL}${KEY()}`;
   const j = await getJSON(url);
+  if (opts.withCount) return { ids: (j.esearchresult && j.esearchresult.idlist) || [], count: +((j.esearchresult && j.esearchresult.count) || 0) };
   return (j.esearchresult && j.esearchresult.idlist) || [];
 }
 
@@ -82,6 +87,17 @@ export async function fetchArticles(ids) {
         date: isoDate(x.sortpubdate) || isoDate(x.epubdate) || '',
         authors: au.slice(0, 3).join(', ') + (au.length > 3 ? ' et al.' : ''),
         types: x.pubtype || [],
+        pubDate: x.pubdate || '',
+        epubDate: x.epubdate || '',
+        issn: x.issn || x.essn || '',
+        retracted: (x.pubtype || []).includes('Retracted Publication'),
+        retractionNotice: (x.pubtype || []).includes('Retraction of Publication'),
+        erratum: (x.pubtype || []).some((t) => /erratum|correction/i.test(t)),
+        preprint: (x.pubtype || []).includes('Preprint'),
+        conference: (x.pubtype || []).some((t) => /congress|meeting abstract/i.test(t)),
+        abstractOnly: !((x.articleids || []).some((a) => a.idtype === 'pmc')),
+        pmcid: ((x.articleids || []).find((a) => a.idtype === 'pmc') || {}).value || '',
+        src: 'pubmed',
         abstract: abs[id] || ''
       });
     }

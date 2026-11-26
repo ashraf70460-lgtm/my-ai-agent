@@ -39,7 +39,28 @@
       "maxDuration": 60
     },
     "api/claude.js": {
+      "maxDuration": 300
+    },
+    "api/research.js": {
+      "maxDuration": 300
+    },
+    "api/search.js": {
       "maxDuration": 60
+    },
+    "api/updates.js": {
+      "maxDuration": 60
+    },
+    "api/verify.js": {
+      "maxDuration": 60
+    },
+    "api/books.js": {
+      "maxDuration": 30
+    },
+    "api/sources.js": {
+      "maxDuration": 30
+    },
+    "api/docs.js": {
+      "maxDuration": 30
     }
   }
 }

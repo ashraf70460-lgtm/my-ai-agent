@@ -18,8 +18,8 @@ export default async function handler(req, res) {
       .slice(-12)
       .map((m) => ({ role: m.role, content: m.content.slice(0, 24000) }));
     if (!messages.length || messages[messages.length - 1].role !== 'user') return res.status(400).json({ error: 'bad-messages' });
-    const text = await runClaude({ system: body.system, messages, tools: Boolean(body.tools), maxTokens: body.maxTokens });
-    return res.status(200).json({ text });
+    const r = await runClaude({ system: body.system, messages, tools: Boolean(body.tools), web: Boolean(body.web), maxTokens: body.maxTokens });
+    return res.status(200).json(r);
   } catch (e) {
     return res.status(502).json({ error: 'claude-failed', detail: String((e && e.message) || e) });
   }

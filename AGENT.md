@@ -1,4 +1,4 @@
-# Agent instructions — how a scheduled run publishes into Pulmonologist
+# Agent instructions — how scheduled runs publish into PULMONOLOGIST-AGENT
 
 The app is a static site plus a few Vercel Functions. Each agent run **adds one report file and updates the index**, then commits and pushes to `main`. Vercel redeploys within about a minute.
 
@@ -78,6 +78,41 @@ git -c push.negotiate=true push origin main
 ## Other tasks
 
 Tasks added in the app (Agent → New scheduled task) use the same file format with their own `taskId`; the app shows them automatically.
+
+## Weekly and monthly consultant briefings
+
+The weekly (Friday) and monthly (1st of the month) scheduled tasks write a **briefing** instead of a daily report.
+
+Research window: weekly = previous 7 days; monthly = previous calendar month. Cover respiratory medicine, critical care and sleep. Sources: PubMed connector (RCTs, meta-analyses, systematic reviews, guidelines; top journals first), WebSearch of GOLD, GINA, ERS, ATS, BTS, ACCP/CHEST, NICE, WHO, ESC, AASM, ESICM, SCCM and Saudi Thoracic Society, ClinicalTrials.gov for major new or completed trials, and FDA/EMA safety communications. Never invent a study, number, date, PMID or DOI; give PMID/DOI only when verified on PubMed or doi.org. Flag preprints and conference abstracts. Mark retracted papers.
+
+Path: `public/data/briefings/<YYYY-MM-DD>-weekly.json` or `<YYYY-MM-DD>-monthly.json` (Riyadh date of the run).
+
+```json
+{
+  "id": "2026-11-27-weekly",
+  "period": "weekly",
+  "date": "2026-11-27",
+  "range": "2026-11-20 → 2026-11-26",
+  "title": { "en": "Weekly consultant briefing — 20–26 Nov 2026", "ar": "الملخص الأسبوعي — 20–26 نوفمبر 2026" },
+  "en": { "concise": "markdown", "extended": "markdown" },
+  "ar": { "concise": "markdown", "extended": "markdown" },
+  "refs": [ { "label": "Short citation", "pmid": "…", "doi": "…", "url": "https://…" } ]
+}
+```
+
+Markdown sections, in this order (both `concise` — one screen, bullets — and `extended` — full detail with tables):
+`## Executive summary` · `## Top practice-changing developments` · `## New and updated guidelines` (table: Clinical area | Previous | Latest | What changed | Clinical importance) · `## Important RCTs` · `## Meta-analyses and systematic reviews` · `## Diagnostics and imaging` · `## New drugs, devices and safety alerts` · `## Topics to watch` · `## Sources`.
+For each key paper: **Title**, Journal, date, design, population, intervention/comparator, primary outcome, main result with numbers, limitations, *Does it change practice?*, PMID/DOI.
+Arabic in Modern Standard Arabic; keep drug, trial, guideline names and abbreviations in Latin script.
+
+Prepend to `public/data/briefings/index.json` → `briefings[]` (replace same `id`, newest first):
+
+```json
+{ "id": "2026-11-27-weekly", "period": "weekly", "date": "2026-11-27", "range": "2026-11-20 → 2026-11-26",
+  "file": "2026-11-27-weekly.json", "title": { "en": "…", "ar": "…" }, "items": 14 }
+```
+
+Validate with `python3 -m json.tool`, then `git add public/data/briefings && git commit -m "Briefing <date> (weekly|monthly)" && git -c push.negotiate=true push origin main`.
 
 ## Not included
 

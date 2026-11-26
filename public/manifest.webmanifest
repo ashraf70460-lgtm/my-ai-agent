@@ -1,14 +1,14 @@
 {
-  "name": "Pulmonologist — respiratory medicine agent",
+  "name": "PULMONOLOGIST-AGENT — respiratory medicine intelligence",
   "short_name": "Pulmonologist",
-  "description": "Dr. Ashraf's AI agent for respiratory medicine: daily reports from websites, guidelines, papers and Telegram; conferences, videos, people, books. English / العربية.",
+  "description": "Consultant-level respiratory medicine intelligence for Ashraf Ahmed: guidelines and what changed, research radar, deep research, landmark trials, books, briefings and a personal library. English / العربية.",
   "id": "/",
   "start_url": "/#home",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#1a47c9",
+  "background_color": "#07111f",
+  "theme_color": "#0b1f3a",
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -34,16 +34,24 @@
   ],
   "shortcuts": [
     {
-      "name": "Today's report",
+      "name": "Today",
       "url": "/#home"
     },
     {
-      "name": "Papers",
-      "url": "/#papers"
+      "name": "Research radar",
+      "url": "/#radar"
     },
     {
-      "name": "Ask the agent",
-      "url": "/#ask"
+      "name": "Deep research",
+      "url": "/#research/deep"
+    },
+    {
+      "name": "Guidelines",
+      "url": "/#guidelines"
+    },
+    {
+      "name": "Library",
+      "url": "/#library"
     }
   ]
 }
