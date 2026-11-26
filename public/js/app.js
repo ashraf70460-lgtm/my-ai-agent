@@ -2,8 +2,8 @@
 (() => {
 const { $, esc, t, toast } = PA;
 PA.i18n({
-  en: { appName: 'App name', theme: 'Theme', lookback: 'Look back (days)', resLang: 'Research output language', depth: 'Default depth', pin: 'App PIN', backup: 'Backup and restore', copyBackup: 'Copy backup', restore: 'Restore', close: 'Close', aiOn: 'Claude connected — analysis, deep research and briefings work.', aiOff: 'Claude not connected — add ANTHROPIC_API_KEY in Vercel. Searches, trials, guidelines and lists still work.', syncOn: 'Synced across your devices.', syncOff: 'Saved on this device only.', restored: 'Backup restored', badBackup: 'That backup could not be read' },
-  ar: { appName: 'اسم التطبيق', theme: 'المظهر', lookback: 'الفترة (أيام)', resLang: 'لغة مخرجات البحث', depth: 'العمق الافتراضي', pin: 'رمز التطبيق', backup: 'النسخ الاحتياطي والاستعادة', copyBackup: 'نسخ احتياطي', restore: 'استعادة', close: 'إغلاق', aiOn: 'Claude متصل — التحليل والبحث المعمق والملخصات تعمل.', aiOff: 'Claude غير متصل — أضف ANTHROPIC_API_KEY في Vercel. البحث والتجارب والإرشادات والقوائم تعمل.', syncOn: 'متزامن بين أجهزتك.', syncOff: 'محفوظ على هذا الجهاز فقط.', restored: 'تمت الاستعادة', badBackup: 'تعذرت قراءة النسخة الاحتياطية' }
+  en: { appName: 'App name', theme: 'Theme', lookback: 'Look back (days)', resLang: 'Research output language', depth: 'Default depth', pin: 'App PIN', backup: 'Backup and restore', copyBackup: 'Copy backup', restore: 'Restore', close: 'Close', aiOn: 'Claude connected — analysis, deep research and briefings work.', pinBad: 'PIN not accepted — Claude features and saving are blocked. Re-enter your PIN above.', pinGood: 'PIN accepted.', aiOff: 'Claude not connected — add ANTHROPIC_API_KEY in Vercel. Searches, trials, guidelines and lists still work.', syncOn: 'Synced across your devices.', syncOff: 'Saved on this device only.', restored: 'Backup restored', badBackup: 'That backup could not be read' },
+  ar: { appName: 'اسم التطبيق', theme: 'المظهر', lookback: 'الفترة (أيام)', resLang: 'لغة مخرجات البحث', depth: 'العمق الافتراضي', pin: 'رمز التطبيق', backup: 'النسخ الاحتياطي والاستعادة', copyBackup: 'نسخ احتياطي', restore: 'استعادة', close: 'إغلاق', aiOn: 'Claude متصل — التحليل والبحث المعمق والملخصات تعمل.', pinBad: 'الرمز غير مقبول — ميزات Claude والحفظ متوقفة. أعد إدخال الرمز أعلاه.', pinGood: 'الرمز مقبول.', aiOff: 'Claude غير متصل — أضف ANTHROPIC_API_KEY في Vercel. البحث والتجارب والإرشادات والقوائم تعمل.', syncOn: 'متزامن بين أجهزتك.', syncOff: 'محفوظ على هذا الجهاز فقط.', restored: 'تمت الاستعادة', badBackup: 'تعذرت قراءة النسخة الاحتياطية' }
 });
 
 /* flow–volume loop: expiratory peak then linear fall, inspiratory semicircle */
@@ -27,7 +27,8 @@ function dots() {
   const s = PA.status;
   $('#hAi').className = 'dot' + (s.ai ? ' ok' : ''); $('#hAi').title = s.ai ? t('aiOn') : t('aiOff');
   $('#hSync').className = 'dot' + (s.sync ? ' ok' : ''); $('#hSync').title = s.sync ? t('syncOn') : t('syncOff');
-  $('#aiDot').className = 'dot' + (s.ai ? ' ok' : ''); $('#aiMsg').textContent = s.ai ? t('aiOn') : t('aiOff');
+  $('#aiDot').className = 'dot' + (s.ai && s.pin ? ' ok' : ''); $('#aiMsg').textContent = (s.ai ? t('aiOn') : t('aiOff')) + ' ' + (s.pin ? t('pinGood') : t('pinBad'));
+  $('#hAi').className = 'dot' + (s.ai && s.pin ? ' ok' : '');
   $('#syncDot').className = 'dot' + (s.sync ? ' ok' : ''); $('#syncMsg').textContent = s.sync ? t('syncOn') : t('syncOff');
 }
 const rerender = PA.rerender;
@@ -46,7 +47,7 @@ $('#fTheme').addEventListener('change', (e) => { PA.S.theme = e.target.value; PA
 $('#fDays').addEventListener('change', (e) => { PA.S.days = +e.target.value; PA.save(); });
 $('#fRLang').addEventListener('change', (e) => { PA.S.researchLang = e.target.value; PA.save(); });
 $('#fDepth').addEventListener('change', (e) => { PA.S.depth = e.target.value; PA.save(); });
-$('#fPin').addEventListener('change', (e) => { PA.setPin(e.target.value.trim()); PA.boot(); });
+$('#fPin').addEventListener('change', (e) => { PA.setPin(e.target.value.trim()); PA.boot().then(dots); });
 $('#copyBtn').addEventListener('click', async () => { const txt = JSON.stringify(PA.S); try { await navigator.clipboard.writeText(txt); $('#copyMsg').textContent = '✓'; } catch (e) { $('#impTxt').value = txt; $('#impTxt').select(); } });
 $('#impBtn').addEventListener('click', () => {
   try { const o = JSON.parse($('#impTxt').value); if (!o || typeof o !== 'object' || !Array.isArray(o.topics)) throw 0; PA.S = PA.load(o); PA.save(); PA.rerender(); toast(t('restored')); }

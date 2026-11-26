@@ -1,5 +1,5 @@
 // PULMONOLOGIST-AGENT offline support: app shell cached, network-first so updates show immediately.
-const VERSION = 'pulmo-v3';
+const VERSION = 'pulmo-v3.1';
 const BASE = '/';
 const SHELL = [BASE, BASE + 'index.html', BASE + 'app.css', BASE + 'data.js', BASE + 'data/config.json', BASE + 'data/trials.js', BASE + 'data/guidelines.js', BASE + 'data/subspecialties.js', BASE + 'js/core.js', BASE + 'js/pdf.js', BASE + 'js/v-home.js', BASE + 'js/v-research.js', BASE + 'js/v-evidence.js', BASE + 'js/v-library.js', BASE + 'js/v-more.js', BASE + 'js/app.js', BASE + 'vendor/pdfmake.min.js', BASE + 'vendor/vfs_fonts.js', BASE + 'manifest.webmanifest', BASE + 'icons/icon.svg', BASE + 'icons/icon-192.png'];
 self.addEventListener('install', (e) => {

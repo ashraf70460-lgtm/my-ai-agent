@@ -71,7 +71,7 @@ let C = {}; try { C = JSON.parse(localStorage.getItem(CACHE) || '{}'); } catch (
 const cache = { get: (k) => C[k], set: (k, v) => { C[k] = v; try { localStorage.setItem(CACHE, JSON.stringify(C)); } catch (e) { C = { [k]: v }; try { localStorage.setItem(CACHE, JSON.stringify(C)); } catch (x) {} } } };
 
 /* ---------- server ---------- */
-const status = { ai: false, sync: false, ready: false };
+const status = { ai: false, sync: false, ready: false, pin: true };
 async function api(path, opts = {}) {
   let r;
   try { r = await fetch(path, { method: opts.method || 'GET', cache: 'no-store', headers: { 'Content-Type': 'application/json', 'x-app-pin': PIN }, body: opts.body ? JSON.stringify(opts.body) : undefined, signal: opts.signal }); }
@@ -286,7 +286,7 @@ async function saveReport(doc) {
 async function boot() {
   const cfg = await fetch('/data/config.json', { cache: 'no-store' }).then((r) => r.json()).catch(() => ({ tasks: [] }));
   if (!S.tasks.length) S.tasks = (cfg.tasks || []).map(fixTask);
-  await api('/api/claude').then((j) => { status.ai = !!j.configured; }).catch(() => { status.ai = false; });
+  await api('/api/claude').then((j) => { status.ai = !!j.configured; status.pin = j.pinOk !== false; }).catch(() => { status.ai = false; });
   try {
     const j = await api('/api/state'); status.sync = true;
     const R = j.state;

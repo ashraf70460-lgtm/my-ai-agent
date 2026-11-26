@@ -7,7 +7,7 @@ import { runClaude, claudeConfigured } from './_claude.js';
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const configured = claudeConfigured();
-  if (req.method === 'GET') return res.status(200).json({ configured, pinRequired: Boolean(process.env.APP_PIN) });
+  if (req.method === 'GET') return res.status(200).json({ configured, pinRequired: Boolean(process.env.APP_PIN), pinOk: checkPin(req) });
   if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return res.status(405).json({ error: 'method-not-allowed' }); }
   if (!configured) return res.status(501).json({ error: 'no-key' });
   if (!checkPin(req)) return res.status(401).json({ error: 'bad-pin' });
