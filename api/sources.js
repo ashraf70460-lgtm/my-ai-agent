@@ -18,7 +18,12 @@ export default async function handler(req, res) {
     probe('openfda', 'openFDA (label changes, recalls)', 'regulatory', async () => `${(await fdaRecalls({ days: 365, max: 1 })).length} test result`),
     probe('googlebooks', 'Google Books → Open Library fallback (editions, ISBN)', 'books', async () => { const r = await books('pulmonary function testing', { max: 1 }); return `${r.length} test result via ${(r[0] && r[0].src) || 'googlebooks'}`; })
   ]);
-  list.push({ id: 'claude', name: 'Claude (analysis, synthesis)', kind: 'ai', ok: Boolean(process.env.ANTHROPIC_API_KEY), detail: process.env.ANTHROPIC_API_KEY ? 'API key set' : 'ANTHROPIC_API_KEY not set' });
+  const key = process.env.ANTHROPIC_API_KEY;
+  list.push(key ? await probe('claude', 'Claude (analysis, synthesis)', 'ai', async () => {
+    const r = await fetch('https://api.anthropic.com/v1/models?limit=1', { headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' } });
+    if (!r.ok) { let m = ''; try { m = (await r.json()).error.message; } catch {} throw new Error(`key rejected (${r.status}) ${m}`.trim()); }
+    return 'API key valid';
+  }) : { id: 'claude', name: 'Claude (analysis, synthesis)', kind: 'ai', ok: false, detail: 'ANTHROPIC_API_KEY not set' });
   list.push({ id: 'websearch', name: 'Web search (via Claude, for society websites)', kind: 'ai', ok: Boolean(process.env.ANTHROPIC_API_KEY) && process.env.WEB_SEARCH !== 'off', detail: process.env.ANTHROPIC_API_KEY ? (process.env.WEB_SEARCH === 'off' ? 'turned off' : 'available when your Anthropic organisation allows web search') : 'needs ANTHROPIC_API_KEY' });
   list.push({ id: 'storage', name: 'Vercel Blob (sync, library documents)', kind: 'storage', ok: Boolean(process.env.BLOB_READ_WRITE_TOKEN), detail: process.env.BLOB_READ_WRITE_TOKEN ? 'configured' : 'not configured' });
   list.push({ id: 'scholar', name: 'Google Scholar', kind: 'database', ok: false, detail: 'No official API; not integrated (Europe PMC and PubMed cover indexed literature)' });
