@@ -1,1 +1,16 @@
-{"briefings":[]}
+{
+  "briefings": [
+    {
+      "id": "2026-11-27-weekly",
+      "period": "weekly",
+      "date": "2026-11-27",
+      "range": "2026-11-20 → 2026-11-26",
+      "file": "2026-11-27-weekly.json",
+      "title": {
+        "en": "Weekly consultant briefing — 20–26 Nov 2026",
+        "ar": "الملخص الأسبوعي — 20–26 نوفمبر 2026"
+      },
+      "items": 16
+    }
+  ]
+}
